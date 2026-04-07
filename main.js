@@ -10,7 +10,6 @@ class LunchRecommender extends HTMLElement {
         /* 컴포넌트 내부 스타일은 style.css의 @layer components 와 동일하게 유지 */
         :host {
           display: block;
-          container-type: inline-size;
           background-color: var(--surface-color, oklch(99% 0.01 240));
           border-radius: 1.5rem;
           padding: 2rem;
@@ -21,27 +20,37 @@ class LunchRecommender extends HTMLElement {
             0 22.3px 17.9px var(--shadow-color, oklch(20% 0.1 240 / 40%)),
             0 41.8px 33.4px var(--shadow-color, oklch(20% 0.1 240 / 40%)),
             0 100px 80px var(--shadow-color, oklch(20% 0.1 240 / 40%));
-          max-width: 400px;
-          text-align: center;
+          max-width: 700px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .text-area {
+            flex: 1;
+            text-align: left;
         }
 
         h1 {
-            font-size: clamp(2rem, 10cqi, 3rem);
-            margin-block-start: 0;
+            font-size: 2rem;
+            margin: 0 0 0.5rem 0;
+            white-space: nowrap;
             color: var(--accent-color, oklch(65% 0.25 290));
         }
 
         .menu-display {
-            min-height: 5rem;
             font-size: 1.5rem;
             font-weight: bold;
-            display: grid;
-            place-content: center;
-            margin-block: 2rem;
             color: var(--text-color, oklch(25% 0.15 240));
+            min-height: 2rem;
         }
 
         button {
+            flex-shrink: 0;
             background-color: var(--accent-color, oklch(65% 0.25 290));
             color: white;
             border: none;
@@ -51,6 +60,7 @@ class LunchRecommender extends HTMLElement {
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 4px 6px oklch(20% 0.1 290 / 30%);
+            align-self: center;
         }
 
         button:hover {
@@ -58,10 +68,12 @@ class LunchRecommender extends HTMLElement {
             box-shadow: 0 6px 10px oklch(20% 0.1 290 / 40%);
         }
       </style>
-      <div>
-        <h1>오늘 뭐 먹지?</h1>
-        <div class="menu-display">점심 메뉴를 추천해 보세요!</div>
-        <button>점심 메뉴 추천받기</button>
+      <div class="container">
+        <div class="text-area">
+          <h1>오늘 뭐 먹지?</h1>
+          <div class="menu-display">점심 메뉴를 추천해 보세요!</div>
+        </div>
+        <button>추천받기</button>
       </div>
     `;
 

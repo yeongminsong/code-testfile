@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TypeScript 기초부터 실전까지 — Devlog</title>
+  <meta name="description" content="TypeScript의 기본 타입, 인터페이스, 제네릭, 유틸리티 타입까지 실전 예제와 함께 배우는 완전 가이드입니다.">
+  <meta property="og:title" content="TypeScript 기초부터 실전까지 — Devlog">
+  <meta property="og:description" content="TypeScript의 기본 타입, 인터페이스, 제네릭, 유틸리티 타입까지 실전 예제와 함께 배우는 완전 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">JavaScript</span>
+          <span class="tag">TypeScript</span>
+        </div>
+        <h1 class="post-h1">TypeScript 기초부터 실전까지</h1>
+        <div class="post-meta">
+          <span>📅 2026. 03. 18</span>
+          <span>⏱ 10분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>JavaScript로 규모가 커지는 프로젝트를 다루다 보면 타입 오류로 인한 런타임 에러를 자주 경험하게 됩니다. <strong>TypeScript</strong>는 JavaScript에 정적 타입을 더한 언어로, 코드 작성 단계에서 오류를 미리 잡아주고 IDE 자동 완성을 강력하게 지원합니다.</p>
+
+        <h2>왜 TypeScript인가?</h2>
+        <p>TypeScript를 사용하면 얻을 수 있는 이점은 다음과 같습니다.</p>
+        <ul>
+          <li><strong>컴파일 타임 오류 검출</strong> — 실행 전에 타입 오류를 잡습니다.</li>
+          <li><strong>IDE 자동완성</strong> — 객체의 속성과 메서드가 자동으로 제안됩니다.</li>
+          <li><strong>코드 문서화</strong> — 타입 자체가 코드의 문서가 됩니다.</li>
+          <li><strong>리팩터링 안전성</strong> — 변수명이나 구조를 바꿀 때 영향 범위를 정확히 알 수 있습니다.</li>
+        </ul>
+
+        <h2>기본 타입</h2>
+        <pre><code class="language-typescript">// 기본 타입 선언
+let name: string = '홍길동';
+let age: number = 30;
+let isActive: boolean = true;
+
+// 배열
+let fruits: string[] = ['사과', '바나나'];
+let scores: Array&lt;number&gt; = [100, 95, 88];
+
+// 튜플 — 길이와 각 요소 타입이 고정된 배열
+let point: [number, number] = [10, 20];
+
+// any — 타입 검사를 건너뜀 (남용 금지)
+let anything: any = '문자열이었다가';
+anything = 42; // 숫자로 바뀌어도 오류 없음
+
+// unknown — any보다 안전한 대안
+let input: unknown = getUserInput();
+if (typeof input === 'string') {
+  console.log(input.toUpperCase()); // 타입 검사 후 사용
+}</code></pre>
+
+        <h2>인터페이스와 타입 별칭</h2>
+        <p>객체의 구조를 정의할 때 <code>interface</code>와 <code>type</code>을 사용합니다.</p>
+        <pre><code class="language-typescript">// Interface
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age?: number; // 선택적 속성 (Optional)
+  readonly createdAt: Date; // 읽기 전용
+}
+
+// Type alias
+type Point = {
+  x: number;
+  y: number;
+};
+
+// 유니온 타입
+type Status = 'pending' | 'active' | 'inactive';
+
+// 함수 타입
+function greet(user: User): string {
+  return `안녕하세요, ${user.name}님!`;
+}
+
+// 화살표 함수
+const add = (a: number, b: number): number => a + b;</code></pre>
+
+        <h2>제네릭(Generics)</h2>
+        <p>제네릭을 사용하면 타입을 파라미터처럼 사용할 수 있어, 다양한 타입에 재사용 가능한 코드를 작성할 수 있습니다.</p>
+        <pre><code class="language-typescript">// 제네릭 함수
+function identity&lt;T&gt;(arg: T): T {
+  return arg;
+}
+
+identity&lt;string&gt;('hello'); // 'hello'
+identity&lt;number&gt;(42);     // 42
+
+// 제네릭 인터페이스
+interface ApiResponse&lt;T&gt; {
+  data: T;
+  status: number;
+  message: string;
+}
+
+// 사용 예시
+const userResponse: ApiResponse&lt;User&gt; = {
+  data: { id: 1, name: '홍길동', email: 'hong@example.com', createdAt: new Date() },
+  status: 200,
+  message: 'success'
+};</code></pre>
+
+        <h2>유틸리티 타입</h2>
+        <p>TypeScript는 기존 타입을 변환하는 유틸리티 타입을 내장합니다.</p>
+        <pre><code class="language-typescript">interface User {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+}
+
+// Partial — 모든 속성을 선택적으로
+type UserUpdate = Partial&lt;User&gt;;
+
+// Pick — 특정 속성만 선택
+type UserPublic = Pick&lt;User, 'id' | 'name' | 'email'&gt;;
+
+// Omit — 특정 속성만 제외
+type UserWithoutPassword = Omit&lt;User, 'password'&gt;;
+
+// Readonly — 모든 속성을 읽기 전용으로
+type ReadonlyUser = Readonly&lt;User&gt;;
+
+// Record — 키-값 맵 타입
+type UserMap = Record&lt;string, User&gt;;</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          TypeScript는 JavaScript의 상위집합으로, 기존 JS 코드를 그대로 사용하면서 점진적으로 타입을 추가할 수 있습니다. <code>any</code> 사용을 최소화하고, 인터페이스와 제네릭을 적극 활용하면 유지보수하기 쉬운 코드를 작성할 수 있습니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

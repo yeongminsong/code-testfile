@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>개발자 생산성을 높이는 VS Code 확장 10선 — Devlog</title>
+  <meta name="description" content="실무에서 검증된 VS Code 확장 프로그램 10가지. 코드 품질, 생산성, 협업을 한 번에 향상시키는 필수 확장 모음입니다.">
+  <meta property="og:title" content="개발자 생산성을 높이는 VS Code 확장 10선 — Devlog">
+  <meta property="og:description" content="실무에서 검증된 VS Code 확장 프로그램 10가지. 코드 품질, 생산성, 협업을 한 번에 향상시키는 필수 확장 모음입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">Tools</span>
+          <span class="tag">DevOps</span>
+        </div>
+        <h1 class="post-h1">개발자 생산성을 높이는 VS Code 확장 10선</h1>
+        <div class="post-meta">
+          <span>📅 2026. 03. 05</span>
+          <span>⏱ 6분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>Visual Studio Code는 수천 개의 확장 프로그램을 제공합니다. 하지만 너무 많은 확장은 오히려 에디터를 느리게 만들 수 있습니다. 수년간 실무에서 사용하며 검증한 필수 확장 10가지를 소개합니다.</p>
+
+        <h2>1. ESLint</h2>
+        <p>JavaScript/TypeScript 코드의 잠재적 오류와 스타일 문제를 실시간으로 감지합니다. 팀 전체의 코드 스타일을 일관되게 유지하는 데 필수입니다.</p>
+        <pre><code class="language-json">// .eslintrc.json
+{
+  "extends": ["eslint:recommended"],
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "warn"
+  }
+}</code></pre>
+
+        <h2>2. Prettier</h2>
+        <p>코드 포매터. 저장할 때마다 자동으로 코드를 정리해줍니다. ESLint와 함께 사용하면 최강의 코드 품질 관리 도구가 됩니다.</p>
+        <pre><code class="language-json">// .prettierrc
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "printWidth": 80
+}</code></pre>
+
+        <h2>3. GitLens</h2>
+        <p>각 코드 줄에 마지막으로 수정한 사람과 커밋 메시지를 인라인으로 보여줍니다. "이 코드 누가 왜 짰어?" 를 즉시 해결할 수 있습니다. 협업 프로젝트에서 특히 유용합니다.</p>
+
+        <h2>4. GitHub Copilot</h2>
+        <p>AI 기반 코드 자동완성. 주석을 작성하면 코드를 생성하고, 반복적인 보일러플레이트를 자동으로 완성해줍니다. 유료이지만 생산성 향상 효과가 가장 큰 확장입니다.</p>
+
+        <h2>5. Auto Rename Tag</h2>
+        <p>HTML/JSX에서 여는 태그를 수정하면 닫는 태그가 자동으로 함께 변경됩니다. 간단하지만 없으면 불편한 확장입니다.</p>
+
+        <h2>6. Path Intellisense</h2>
+        <p><code>import</code>나 <code>src</code>에서 파일 경로를 입력할 때 자동완성을 제공합니다. 오타로 인한 모듈 불러오기 오류를 방지합니다.</p>
+
+        <h2>7. Thunder Client</h2>
+        <p>VS Code 내장 REST API 테스트 도구입니다. Postman 없이도 API를 테스트하고 응답을 확인할 수 있습니다. 컬렉션 저장과 환경 변수도 지원합니다.</p>
+
+        <h2>8. Error Lens</h2>
+        <p>에러와 경고 메시지를 해당 코드 줄 옆에 바로 표시합니다. 파일 하단의 오류 패널을 매번 확인하지 않아도 됩니다.</p>
+
+        <h2>9. Live Share</h2>
+        <p>실시간 협업 기능입니다. 링크 하나로 팀원과 같은 코드를 동시에 편집하고, 터미널과 서버도 공유할 수 있습니다. 페어 프로그래밍과 코드 리뷰에 유용합니다.</p>
+
+        <h2>10. TODO Highlight</h2>
+        <p>코드 내의 <code>TODO</code>, <code>FIXME</code>, <code>HACK</code> 주석을 강조 표시합니다. 나중에 처리해야 할 항목을 놓치지 않도록 도와줍니다.</p>
+        <pre><code class="language-javascript">// TODO: 에러 처리 추가하기
+// FIXME: 엣지 케이스 버그 수정 필요
+// HACK: 임시 방편 — 리팩토링 필요
+function processData(data) {
+  return data;
+}</code></pre>
+
+        <div class="callout">
+          <strong>팁: 확장 프로필 활용하기</strong><br>
+          VS Code의 Profiles 기능을 사용하면 프로젝트 종류별로 다른 확장 세트를 유지할 수 있습니다. Python 프로젝트용, React 프로젝트용, 문서 작업용 프로필을 따로 만들어 에디터를 항상 가볍게 유지하세요.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

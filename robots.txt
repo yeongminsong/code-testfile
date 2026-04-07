@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://info-batches.pages.dev/sitemap.xml

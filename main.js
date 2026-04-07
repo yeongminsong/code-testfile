@@ -1,3 +1,48 @@
+// ── Cookie Consent ──
+(function () {
+  if (localStorage.getItem('cookie_consent')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'cookieBanner';
+  banner.innerHTML = `
+    <div style="
+      position:fixed;bottom:0;left:0;right:0;z-index:9999;
+      background:#1c1c24;color:#e8eaf0;
+      padding:1rem 2rem;display:flex;align-items:center;
+      justify-content:space-between;gap:1rem;flex-wrap:wrap;
+      border-top:2px solid #6891f8;font-family:inherit;font-size:0.9rem;
+      box-shadow:0 -4px 20px rgba(0,0,0,0.3);
+    ">
+      <p style="margin:0;flex:1;min-width:200px;">
+        이 사이트는 서비스 개선 및 맞춤형 광고 제공을 위해 쿠키를 사용합니다.
+        <a href="/privacy.html" style="color:#6891f8;text-decoration:underline;">개인정보처리방침</a>
+      </p>
+      <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+        <button id="cookieAccept" style="
+          background:#6891f8;color:#fff;border:none;
+          padding:0.5rem 1.25rem;border-radius:0.4rem;
+          cursor:pointer;font-weight:700;font-size:0.875rem;font-family:inherit;
+        ">동의</button>
+        <button id="cookieDecline" style="
+          background:transparent;color:#9ca3af;border:1px solid #4b5563;
+          padding:0.5rem 1.25rem;border-radius:0.4rem;
+          cursor:pointer;font-size:0.875rem;font-family:inherit;
+        ">거부</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  document.getElementById('cookieAccept').addEventListener('click', () => {
+    localStorage.setItem('cookie_consent', 'accepted');
+    banner.remove();
+  });
+  document.getElementById('cookieDecline').addEventListener('click', () => {
+    localStorage.setItem('cookie_consent', 'declined');
+    banner.remove();
+  });
+})();
+
 // ── Theme Toggle ──
 const toggle = document.getElementById('themeToggle');
 const html = document.documentElement;

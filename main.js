@@ -7,65 +7,67 @@ class LunchRecommender extends HTMLElement {
     const template = document.createElement('template');
     template.innerHTML = `
       <style>
-        /* 컴포넌트 내부 스타일은 style.css의 @layer components 와 동일하게 유지 */
         :host {
           display: block;
-          background-color: var(--surface-color, oklch(99% 0.01 240));
+          background-color: var(--surface-color);
           border-radius: 1.5rem;
           padding: 2rem;
           box-shadow:
-            0 2.8px 2.2px var(--shadow-color, oklch(20% 0.1 240 / 40%)),
-            0 6.7px 5.3px var(--shadow-color, oklch(20% 0.1 240 / 40%)),
-            0 12.5px 10px var(--shadow-color, oklch(20% 0.1 240 / 40%)),
-            0 22.3px 17.9px var(--shadow-color, oklch(20% 0.1 240 / 40%)),
-            0 41.8px 33.4px var(--shadow-color, oklch(20% 0.1 240 / 40%)),
-            0 100px 80px var(--shadow-color, oklch(20% 0.1 240 / 40%));
+            0 2.8px 2.2px var(--shadow-color),
+            0 6.7px 5.3px var(--shadow-color),
+            0 12.5px 10px var(--shadow-color),
+            0 22.3px 17.9px var(--shadow-color),
+            0 41.8px 33.4px var(--shadow-color),
+            0 100px 80px var(--shadow-color);
           max-width: 700px;
+          transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .container {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 2rem;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 2rem;
         }
 
         .text-area {
-            flex: 1;
-            text-align: left;
+          flex: 1;
+          text-align: left;
         }
 
         h1 {
-            font-size: 2rem;
-            margin: 0 0 0.5rem 0;
-            white-space: nowrap;
-            color: var(--accent-color, oklch(65% 0.25 290));
+          font-size: 2rem;
+          margin: 0 0 0.5rem 0;
+          white-space: nowrap;
+          color: var(--accent-color);
+          transition: color 0.3s ease;
         }
 
         .menu-display {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text-color, oklch(25% 0.15 240));
-            min-height: 2rem;
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: var(--text-color);
+          min-height: 2rem;
+          transition: color 0.3s ease;
         }
 
         button {
-            flex-shrink: 0;
-            background-color: var(--accent-color, oklch(65% 0.25 290));
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 4px 6px oklch(20% 0.1 290 / 30%);
-            align-self: center;
+          flex-shrink: 0;
+          background-color: var(--accent-color);
+          color: white;
+          border: none;
+          border-radius: 0.75rem;
+          padding: 1rem 2rem;
+          font-size: 1.2rem;
+          cursor: pointer;
+          transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+          box-shadow: 0 4px 6px var(--shadow-color);
+          align-self: center;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px oklch(20% 0.1 290 / 40%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 10px var(--shadow-color);
         }
       </style>
       <div class="container">

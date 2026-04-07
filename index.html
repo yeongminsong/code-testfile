@@ -7,9 +7,24 @@
   <link href="/style.css" rel="stylesheet">
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
   <main>
     <lunch-recommender></lunch-recommender>
   </main>
   <script type="module" src="/main.js"></script>
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    toggle.textContent = saved === 'dark' ? '☀️' : '🌙';
+
+    toggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+  </script>
 </body>
 </html>

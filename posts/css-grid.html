@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSS Grid 레이아웃 마스터하기 — Devlog</title>
+  <meta name="description" content="CSS Grid의 기본 개념부터 반응형 레이아웃, 복잡한 그리드 디자인까지 실전 예제로 완전히 마스터하는 가이드입니다.">
+  <meta property="og:title" content="CSS Grid 레이아웃 마스터하기 — Devlog">
+  <meta property="og:description" content="CSS Grid의 기본 개념부터 반응형 레이아웃, 복잡한 그리드 디자인까지 실전 예제로 완전히 마스터하는 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">CSS</span><span class="tag">Design</span></div>
+        <h1 class="post-h1">CSS Grid 레이아웃 마스터하기</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 04</span>
+          <span>⏱ 9분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>Flexbox가 1차원(행 또는 열) 레이아웃을 다룬다면, <strong>CSS Grid</strong>는 행과 열을 동시에 제어하는 2차원 레이아웃 시스템입니다. 복잡한 페이지 레이아웃을 float이나 position 없이 깔끔하게 구현할 수 있습니다.</p>
+
+        <h2>Grid 기본 개념</h2>
+        <pre><code class="language-css">.container {
+  display: grid;
+
+  /* 3개의 열: 각각 1fr(가용 공간의 1/3) */
+  grid-template-columns: 1fr 1fr 1fr;
+  /* 단축: repeat(3, 1fr) */
+
+  /* 행 높이 자동 (내용에 맞춤) */
+  grid-template-rows: auto;
+
+  /* 셀 간격 */
+  gap: 1rem;
+  /* row-gap: 1rem; column-gap: 2rem; 로 개별 설정 가능 */
+}</code></pre>
+
+        <h2>fr 단위와 고정 크기 혼합</h2>
+        <pre><code class="language-css">.layout {
+  display: grid;
+  /* 사이드바 240px 고정, 나머지는 메인 영역 */
+  grid-template-columns: 240px 1fr;
+  /* 헤더 64px, 본문 자동, 푸터 60px */
+  grid-template-rows: 64px 1fr 60px;
+  min-height: 100vh;
+  gap: 0;
+}</code></pre>
+
+        <h2>grid-template-areas — 이름으로 배치</h2>
+        <p>레이아웃을 ASCII 아트처럼 직관적으로 정의할 수 있습니다.</p>
+        <pre><code class="language-css">.page {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 64px 1fr 60px;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  min-height: 100vh;
+}
+
+.header  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main    { grid-area: main; }
+.footer  { grid-area: footer; }</code></pre>
+
+        <h2>아이템 배치 제어</h2>
+        <pre><code class="language-css">/* 특정 아이템이 여러 셀을 차지하게 하기 */
+.featured {
+  grid-column: 1 / 3;  /* 1번 줄부터 3번 줄까지 (2칸) */
+  grid-row: 1 / 3;     /* 1번 줄부터 3번 줄까지 (2행) */
+}
+
+/* span 키워드 사용 */
+.wide  { grid-column: span 2; } /* 2칸 차지 */
+.tall  { grid-row: span 3; }    /* 3행 차지 */</code></pre>
+
+        <h2>반응형 그리드 — auto-fill & minmax</h2>
+        <p>화면 크기에 따라 자동으로 열 수가 조정되는 반응형 그리드를 미디어 쿼리 없이 구현할 수 있습니다.</p>
+        <pre><code class="language-css">.card-grid {
+  display: grid;
+  /* 최소 280px, 최대 1fr로 자동으로 열 수 결정 */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* auto-fill: 공간이 남아도 빈 셀 유지 */
+/* auto-fit:  남는 공간을 기존 아이템이 채움 */</code></pre>
+
+        <h2>정렬 제어</h2>
+        <pre><code class="language-css">.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 200px);
+
+  /* 전체 그리드 정렬 (컨테이너 기준) */
+  justify-content: center;  /* 가로 */
+  align-content: center;    /* 세로 */
+
+  /* 셀 내부 아이템 정렬 */
+  justify-items: center;
+  align-items: center;
+}
+
+/* 개별 아이템 정렬 오버라이드 */
+.special {
+  justify-self: end;
+  align-self: start;
+}</code></pre>
+
+        <h2>실전: 블로그 카드 그리드</h2>
+        <pre><code class="language-css">.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* 첫 번째 카드를 가로 전체로 */
+.post-card:first-child {
+  grid-column: 1 / -1; /* -1은 마지막 줄 */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+  .post-card:first-child {
+    grid-template-columns: 1fr;
+  }
+}</code></pre>
+
+        <div class="callout">
+          <strong>Grid vs Flexbox 선택 기준</strong><br>
+          카드 목록, 대시보드, 전체 페이지 레이아웃처럼 <strong>2차원</strong> 배치가 필요하면 Grid를 사용하세요. 네비게이션 바, 버튼 그룹처럼 <strong>1차원</strong> 정렬이 목적이면 Flexbox가 적합합니다. 둘을 함께 사용하는 것도 훌륭한 선택입니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

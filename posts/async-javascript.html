@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JavaScript 비동기 완전 정복 — Promise, async/await — Devlog</title>
+  <meta name="description" content="콜백 지옥부터 Promise, async/await까지 JavaScript 비동기 프로그래밍을 실전 예제로 완전히 이해하는 가이드입니다.">
+  <meta property="og:title" content="JavaScript 비동기 완전 정복 — Devlog">
+  <meta property="og:description" content="콜백 지옥부터 Promise, async/await까지 JavaScript 비동기 프로그래밍을 실전 예제로 완전히 이해하는 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">JavaScript</span></div>
+        <h1 class="post-h1">JavaScript 비동기 완전 정복 — Promise, async/await</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 06</span>
+          <span>⏱ 11분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>JavaScript는 싱글 스레드 언어입니다. 하나의 작업이 끝나야 다음 작업을 시작할 수 있습니다. 그런데 네트워크 요청처럼 시간이 오래 걸리는 작업을 동기적으로 처리하면 브라우저가 완전히 멈춰버립니다. 이 문제를 해결하기 위해 <strong>비동기 프로그래밍</strong>이 존재합니다.</p>
+
+        <h2>1단계: 콜백(Callback)</h2>
+        <p>가장 초기 방식은 콜백 함수입니다. 작업이 완료됐을 때 호출할 함수를 미리 넘기는 방식입니다.</p>
+        <pre><code class="language-javascript">function fetchUser(id, callback) {
+  setTimeout(() => {
+    callback(null, { id, name: '홍길동' });
+  }, 1000);
+}
+
+fetchUser(1, (err, user) => {
+  if (err) return console.error(err);
+  console.log(user.name);
+});</code></pre>
+        <p>문제는 중첩이 깊어질수록 "콜백 지옥"이 발생한다는 점입니다.</p>
+        <pre><code class="language-javascript">// 콜백 지옥 — 읽기도, 관리하기도 어렵습니다
+getUser(1, (err, user) => {
+  getPosts(user.id, (err, posts) => {
+    getComments(posts[0].id, (err, comments) => {
+      getLikes(comments[0].id, (err, likes) => {
+        console.log(likes); // 4단계 중첩...
+      });
+    });
+  });
+});</code></pre>
+
+        <h2>2단계: Promise</h2>
+        <p>Promise는 비동기 작업의 미래 결과를 나타내는 객체입니다. <code>pending</code>(대기), <code>fulfilled</code>(이행), <code>rejected</code>(거부) 세 가지 상태를 가집니다.</p>
+        <pre><code class="language-javascript">function fetchUser(id) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (id > 0) {
+        resolve({ id, name: '홍길동' });
+      } else {
+        reject(new Error('잘못된 ID'));
+      }
+    }, 1000);
+  });
+}
+
+fetchUser(1)
+  .then(user => console.log(user.name)) // 성공
+  .catch(err => console.error(err))     // 실패
+  .finally(() => console.log('완료'));  // 항상 실행</code></pre>
+
+        <p>Promise를 체이닝하면 중첩 없이 순차 처리가 가능합니다.</p>
+        <pre><code class="language-javascript">getUser(1)
+  .then(user => getPosts(user.id))
+  .then(posts => getComments(posts[0].id))
+  .then(comments => getLikes(comments[0].id))
+  .then(likes => console.log(likes))
+  .catch(err => console.error(err));</code></pre>
+
+        <h2>병렬 처리: Promise.all & Promise.allSettled</h2>
+        <pre><code class="language-javascript">// 모두 성공해야 함 — 하나라도 실패하면 catch
+const [user, posts] = await Promise.all([
+  fetchUser(1),
+  fetchPosts(1)
+]);
+
+// 각각의 성공/실패를 모두 받음
+const results = await Promise.allSettled([
+  fetchUser(1),
+  fetchUser(999) // 실패해도 OK
+]);
+
+results.forEach(result => {
+  if (result.status === 'fulfilled') {
+    console.log(result.value);
+  } else {
+    console.error(result.reason);
+  }
+});</code></pre>
+
+        <h2>3단계: async/await</h2>
+        <p>ES2017에서 도입된 <code>async/await</code>는 Promise를 동기 코드처럼 읽기 좋게 작성할 수 있게 해줍니다.</p>
+        <pre><code class="language-javascript">async function loadUserDashboard(userId) {
+  try {
+    const user = await fetchUser(userId);
+    const posts = await fetchPosts(user.id);
+    const comments = await fetchComments(posts[0].id);
+
+    return { user, posts, comments };
+  } catch (err) {
+    console.error('데이터 로드 실패:', err);
+    throw err;
+  }
+}
+
+// 최상위에서 async 함수 호출
+loadUserDashboard(1).then(dashboard => {
+  renderDashboard(dashboard);
+});</code></pre>
+
+        <h2>실전 패턴: API 요청 유틸리티</h2>
+        <pre><code class="language-javascript">async function api(url, options = {}) {
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || `HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+// 사용
+const user = await api('/api/users/1');
+const newPost = await api('/api/posts', {
+  method: 'POST',
+  body: JSON.stringify({ title: '새 글', content: '...' })
+});</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          콜백 → Promise → async/await 순서로 발전했습니다. 현대 JavaScript에서는 <code>async/await</code>를 기본으로 사용하고, 병렬 처리가 필요할 땐 <code>Promise.all</code>을 활용하세요. 에러 처리는 반드시 <code>try/catch</code>로 감싸세요.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

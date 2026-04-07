@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JavaScript 디자인 패턴 실무 적용 — Devlog</title>
+  <meta name="description" content="싱글턴, 옵저버, 팩토리, 전략 패턴 등 JavaScript에서 자주 쓰이는 디자인 패턴을 실전 예제로 배우는 가이드입니다.">
+  <meta property="og:title" content="JavaScript 디자인 패턴 실무 적용 — Devlog">
+  <meta property="og:description" content="싱글턴, 옵저버, 팩토리, 전략 패턴 등 JavaScript에서 자주 쓰이는 디자인 패턴을 실전 예제로 배우는 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">Architecture</span></div>
+        <h1 class="post-h1">JavaScript 디자인 패턴 실무 적용</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 07</span>
+          <span>⏱ 12분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>디자인 패턴은 반복적으로 발생하는 설계 문제에 대한 검증된 해결책입니다. GoF의 23가지 패턴 중 JavaScript 실무에서 자주 쓰이는 핵심 패턴들을 실제 코드로 살펴봅니다. 패턴 자체보다 <strong>어떤 문제를 해결하는지</strong>에 집중하세요.</p>
+
+        <h2>1. 싱글턴 (Singleton)</h2>
+        <p>클래스의 인스턴스를 하나만 생성하고 전역 접근점을 제공합니다. DB 연결, 설정, 로거에 적합합니다.</p>
+        <pre><code class="language-javascript">// ES 모듈 자체가 싱글턴 (가장 간단한 방법)
+// db.js
+let connection = null;
+
+export function getDB() {
+  if (!connection) {
+    connection = createDatabaseConnection();
+  }
+  return connection;
+}
+
+// 클래스 기반 싱글턴
+class ConfigManager {
+  static #instance = null;
+  #config = {};
+
+  static getInstance() {
+    if (!ConfigManager.#instance) {
+      ConfigManager.#instance = new ConfigManager();
+    }
+    return ConfigManager.#instance;
+  }
+
+  set(key, value) { this.#config[key] = value; }
+  get(key) { return this.#config[key]; }
+}
+
+const config = ConfigManager.getInstance();
+config.set('apiUrl', 'https://api.devlog.kr');</code></pre>
+
+        <h2>2. 옵저버 (Observer)</h2>
+        <p>객체의 상태 변화를 여러 곳에서 구독(subscribe)하는 패턴. 이벤트 시스템, 상태 관리에 광범위하게 사용됩니다.</p>
+        <pre><code class="language-javascript">class EventEmitter {
+  #listeners = new Map();
+
+  on(event, callback) {
+    if (!this.#listeners.has(event)) {
+      this.#listeners.set(event, new Set());
+    }
+    this.#listeners.get(event).add(callback);
+    // 구독 해제 함수 반환
+    return () => this.off(event, callback);
+  }
+
+  off(event, callback) {
+    this.#listeners.get(event)?.delete(callback);
+  }
+
+  emit(event, data) {
+    this.#listeners.get(event)?.forEach(cb => cb(data));
+  }
+}
+
+// 사용 예시
+const store = new EventEmitter();
+
+const unsubscribe = store.on('userLogin', (user) => {
+  console.log(`${user.name} 로그인`);
+  updateUI(user);
+});
+
+store.emit('userLogin', { name: '홍길동', role: 'admin' });
+
+// 필요 없을 때 구독 해제
+unsubscribe();</code></pre>
+
+        <h2>3. 팩토리 (Factory)</h2>
+        <p>객체 생성 로직을 캡슐화합니다. 생성할 객체 타입이 런타임에 결정되거나, 복잡한 초기화 로직이 있을 때 유용합니다.</p>
+        <pre><code class="language-javascript">// 알림 타입에 따라 다른 알림 객체 생성
+class Notification {
+  constructor(message) { this.message = message; }
+  send() { throw new Error('구현 필요'); }
+}
+
+class EmailNotification extends Notification {
+  send() { console.log(`📧 이메일: ${this.message}`); }
+}
+
+class SMSNotification extends Notification {
+  send() { console.log(`📱 SMS: ${this.message}`); }
+}
+
+class PushNotification extends Notification {
+  send() { console.log(`🔔 푸시: ${this.message}`); }
+}
+
+// 팩토리 함수
+function createNotification(type, message) {
+  const types = {
+    email: EmailNotification,
+    sms: SMSNotification,
+    push: PushNotification,
+  };
+  const NotificationClass = types[type];
+  if (!NotificationClass) throw new Error(`알 수 없는 알림 타입: ${type}`);
+  return new NotificationClass(message);
+}
+
+// 사용
+const notification = createNotification('email', '새 댓글이 달렸습니다');
+notification.send();</code></pre>
+
+        <h2>4. 전략 (Strategy)</h2>
+        <p>알고리즘을 캡슐화하고 교체 가능하게 만듭니다. 정렬 방식, 결제 방법, 인증 방식 같은 교체 가능한 로직에 적합합니다.</p>
+        <pre><code class="language-javascript">// 결제 전략
+const paymentStrategies = {
+  card: async ({ amount, cardNumber }) => {
+    // 카드 결제 API 호출
+    return { success: true, method: 'card', amount };
+  },
+  kakao: async ({ amount, userId }) => {
+    // 카카오페이 API 호출
+    return { success: true, method: 'kakao', amount };
+  },
+  transfer: async ({ amount, accountNumber }) => {
+    // 계좌이체 처리
+    return { success: true, method: 'transfer', amount };
+  }
+};
+
+class PaymentProcessor {
+  constructor(strategy) {
+    this.strategy = strategy;
+  }
+
+  setStrategy(strategy) {
+    this.strategy = strategy;
+  }
+
+  async pay(amount, details) {
+    return this.strategy({ amount, ...details });
+  }
+}
+
+const processor = new PaymentProcessor(paymentStrategies.card);
+await processor.pay(10000, { cardNumber: '1234-5678-9012-3456' });
+
+// 런타임에 전략 교체
+processor.setStrategy(paymentStrategies.kakao);
+await processor.pay(5000, { userId: 'user123' });</code></pre>
+
+        <h2>5. 데코레이터 (Decorator)</h2>
+        <p>기존 함수/객체를 수정하지 않고 기능을 추가합니다. 로깅, 캐싱, 검증 등 횡단 관심사(cross-cutting concerns)에 이상적입니다.</p>
+        <pre><code class="language-javascript">// 함수 데코레이터 — 로깅
+function withLogging(fn) {
+  return async function (...args) {
+    console.log(`[${fn.name}] 호출`, args);
+    const start = Date.now();
+    try {
+      const result = await fn(...args);
+      console.log(`[${fn.name}] 완료 (${Date.now() - start}ms)`, result);
+      return result;
+    } catch (err) {
+      console.error(`[${fn.name}] 오류`, err);
+      throw err;
+    }
+  };
+}
+
+// 캐싱 데코레이터
+function withCache(fn, ttl = 60000) {
+  const cache = new Map();
+  return async function (...args) {
+    const key = JSON.stringify(args);
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.time < ttl) {
+      return cached.value;
+    }
+    const value = await fn(...args);
+    cache.set(key, { value, time: Date.now() });
+    return value;
+  };
+}
+
+// 조합 사용
+const fetchUser = withLogging(withCache(
+  async (id) => fetch(`/api/users/${id}`).then(r => r.json()),
+  300000  // 5분 캐시
+));</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          디자인 패턴은 도구이지 목표가 아닙니다. 싱글턴은 공유 자원 관리, 옵저버는 이벤트 기반 통신, 팩토리는 유연한 객체 생성, 전략은 교체 가능한 알고리즘, 데코레이터는 기능 합성에 각각 강합니다. 패턴을 억지로 끼워 맞추기보다, 실제 문제가 생겼을 때 적합한 패턴을 자연스럽게 적용하는 것이 좋습니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

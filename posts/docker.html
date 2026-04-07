@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Docker 기초 — 컨테이너로 개발 환경 통일하기 — Devlog</title>
+  <meta name="description" content="Docker의 핵심 개념인 이미지, 컨테이너, Dockerfile, docker-compose를 실전 예제로 배우는 입문 가이드입니다.">
+  <meta property="og:title" content="Docker 기초 — 컨테이너로 개발 환경 통일하기 — Devlog">
+  <meta property="og:description" content="Docker의 핵심 개념인 이미지, 컨테이너, Dockerfile, docker-compose를 실전 예제로 배우는 입문 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1605745341112-85968b19335b?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1605745341112-85968b19335b?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">DevOps</span><span class="tag">Tools</span></div>
+        <h1 class="post-h1">Docker 기초 — 컨테이너로 개발 환경 통일하기</h1>
+        <div class="post-meta">
+          <span>📅 2026. 03. 30</span>
+          <span>⏱ 9분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>"내 컴퓨터에서는 되는데요?" — 개발자라면 한 번쯤 들어봤거나 해본 말일 겁니다. 환경 차이로 인한 버그는 매우 흔하고 해결하기도 어렵습니다. <strong>Docker</strong>는 애플리케이션과 그 실행 환경을 하나의 컨테이너로 패키징해 어디서든 동일하게 실행할 수 있게 해줍니다.</p>
+
+        <h2>핵심 개념</h2>
+        <ul>
+          <li><strong>이미지(Image)</strong>: 컨테이너를 만들기 위한 읽기 전용 템플릿. 레이어 구조로 효율적으로 관리됩니다.</li>
+          <li><strong>컨테이너(Container)</strong>: 이미지를 실행한 인스턴스. 격리된 환경에서 동작합니다.</li>
+          <li><strong>Dockerfile</strong>: 이미지를 만드는 설계도(명령어 모음).</li>
+          <li><strong>레지스트리(Registry)</strong>: Docker Hub처럼 이미지를 저장하고 공유하는 저장소.</li>
+        </ul>
+
+        <h2>기본 명령어</h2>
+        <pre><code class="language-bash"># 이미지 다운로드
+docker pull nginx
+
+# 컨테이너 실행 (-d: 백그라운드, -p: 포트 매핑)
+docker run -d -p 8080:80 --name my-nginx nginx
+
+# 실행 중인 컨테이너 목록
+docker ps
+
+# 모든 컨테이너 (중지 포함)
+docker ps -a
+
+# 컨테이너 중지 / 시작 / 삭제
+docker stop my-nginx
+docker start my-nginx
+docker rm my-nginx
+
+# 로그 확인
+docker logs -f my-nginx
+
+# 컨테이너 내부 접속
+docker exec -it my-nginx bash</code></pre>
+
+        <h2>Dockerfile 작성하기</h2>
+        <pre><code class="language-dockerfile"># Node.js 앱 Dockerfile
+FROM node:20-alpine          # 베이스 이미지 (경량 Alpine Linux)
+
+WORKDIR /app                  # 작업 디렉토리 설정
+
+# 의존성 먼저 복사 (캐시 최적화)
+COPY package*.json ./
+RUN npm install --production
+
+# 소스 코드 복사
+COPY . .
+
+# 포트 노출 (문서용, 실제 바인딩은 docker run -p에서)
+EXPOSE 3000
+
+# 컨테이너 시작 명령
+CMD ["node", "app.js"]</code></pre>
+
+        <pre><code class="language-bash"># 이미지 빌드
+docker build -t my-app:1.0 .
+
+# 실행
+docker run -d -p 3000:3000 --name my-app my-app:1.0</code></pre>
+
+        <h2>.dockerignore</h2>
+        <pre><code class="language-bash">node_modules
+.git
+.env
+*.log
+README.md</code></pre>
+
+        <h2>docker-compose로 멀티 컨테이너 관리</h2>
+        <pre><code class="language-yaml"># docker-compose.yml
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_URL=mongodb://db:27017/mydb
+    depends_on:
+      - db
+    volumes:
+      - ./logs:/app/logs  # 로그 파일 호스트와 공유
+
+  db:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db  # 데이터 영속성
+
+volumes:
+  mongo_data:</code></pre>
+
+        <pre><code class="language-bash"># 모든 서비스 시작
+docker-compose up -d
+
+# 로그 확인
+docker-compose logs -f app
+
+# 특정 서비스 재시작
+docker-compose restart app
+
+# 전체 종료 및 볼륨 삭제
+docker-compose down -v</code></pre>
+
+        <h2>멀티 스테이지 빌드 (최적화)</h2>
+        <pre><code class="language-dockerfile"># 빌드 스테이지
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# 실행 스테이지 (빌드 결과물만 복사)
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+RUN npm install --production
+CMD ["node", "dist/app.js"]</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          Docker는 "환경 차이" 문제를 컨테이너로 해결합니다. Dockerfile로 이미지를 정의하고, docker-compose로 여러 서비스를 함께 관리하세요. 멀티 스테이지 빌드로 최종 이미지 크기를 최소화하는 것이 좋습니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

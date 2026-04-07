@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SQL vs NoSQL — 데이터베이스 선택 완전 가이드 — Devlog</title>
+  <meta name="description" content="관계형 데이터베이스(PostgreSQL, MySQL)와 비관계형 데이터베이스(MongoDB, Redis)의 차이를 실전 예제로 비교하고 올바른 선택 기준을 알아봅니다.">
+  <meta property="og:title" content="SQL vs NoSQL — 데이터베이스 선택 완전 가이드 — Devlog">
+  <meta property="og:description" content="관계형 데이터베이스와 비관계형 데이터베이스의 차이를 실전 예제로 비교하고 올바른 선택 기준을 알아봅니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">Database</span><span class="tag">Backend</span></div>
+        <h1 class="post-h1">SQL vs NoSQL — 데이터베이스 선택 완전 가이드</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 07</span>
+          <span>⏱ 11분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>새 프로젝트를 시작할 때 가장 먼저 마주치는 선택 중 하나가 데이터베이스입니다. <strong>SQL(관계형)</strong>과 <strong>NoSQL(비관계형)</strong>은 데이터를 저장하고 조회하는 방식이 근본적으로 다릅니다. "어떤 게 더 좋아?"가 아니라 "이 상황에 무엇이 적합한가"로 접근해야 합니다.</p>
+
+        <h2>관계형 DB(SQL) — PostgreSQL 예시</h2>
+        <p>데이터를 <strong>테이블(행과 열)</strong>로 저장하고, 테이블 간 관계를 외래 키로 정의합니다.</p>
+        <pre><code class="language-sql">-- 테이블 생성
+CREATE TABLE users (
+  id       SERIAL PRIMARY KEY,
+  email    VARCHAR(255) UNIQUE NOT NULL,
+  name     VARCHAR(100) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE posts (
+  id         SERIAL PRIMARY KEY,
+  user_id    INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  title      VARCHAR(500) NOT NULL,
+  content    TEXT,
+  published  BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- JOIN으로 연관 데이터 조회
+SELECT
+  u.name AS author,
+  p.title,
+  p.created_at
+FROM posts p
+JOIN users u ON p.user_id = u.id
+WHERE p.published = TRUE
+ORDER BY p.created_at DESC
+LIMIT 10;</code></pre>
+
+        <h2>트랜잭션 — ACID 보장</h2>
+        <pre><code class="language-sql">-- 계좌 이체: 출금과 입금이 동시에 성공/실패해야 함
+BEGIN;
+
+UPDATE accounts SET balance = balance - 10000
+WHERE id = 1 AND balance >= 10000;
+
+UPDATE accounts SET balance = balance + 10000
+WHERE id = 2;
+
+-- 두 업데이트 모두 성공해야 커밋
+COMMIT;
+-- 하나라도 실패하면 ROLLBACK;</code></pre>
+
+        <h2>비관계형 DB(NoSQL) — MongoDB 예시</h2>
+        <p>데이터를 <strong>문서(Document)</strong> 형태로 저장합니다. 스키마가 유연하며 중첩 구조를 그대로 저장할 수 있습니다.</p>
+        <pre><code class="language-javascript">// MongoDB — 문서(Document) 예시
+{
+  _id: ObjectId("507f1f77bcf86cd799439011"),
+  email: "dev@devlog.kr",
+  name: "홍길동",
+  // 관련 데이터를 중첩해서 저장 (JOIN 불필요)
+  posts: [
+    {
+      title: "Node.js 입문",
+      tags: ["javascript", "backend"],
+      published: true,
+      views: 1234
+    }
+  ],
+  preferences: {
+    theme: "dark",
+    notifications: { email: true, push: false }
+  }
+}
+
+// 조회
+db.users.find({
+  "posts.published": true,
+  "preferences.theme": "dark"
+}).sort({ createdAt: -1 }).limit(10);
+
+// 집계 파이프라인
+db.posts.aggregate([
+  { $match: { published: true } },
+  { $group: { _id: "$tags", count: { $sum: 1 } } },
+  { $sort: { count: -1 } },
+  { $limit: 5 }
+]);</code></pre>
+
+        <h2>Redis — 인메모리 캐시 DB</h2>
+        <pre><code class="language-javascript">const redis = require('redis');
+const client = redis.createClient();
+
+// 세션 저장 (1시간 만료)
+await client.setEx(`session:${userId}`, 3600, JSON.stringify(sessionData));
+
+// 캐시 패턴
+async function getUser(id) {
+  const cached = await client.get(`user:${id}`);
+  if (cached) return JSON.parse(cached);
+
+  const user = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+  await client.setEx(`user:${id}`, 300, JSON.stringify(user)); // 5분 캐시
+  return user;
+}
+
+// 카운터 (조회수, 좋아요 수)
+await client.incr(`post:${postId}:views`);
+
+// 순위 (리더보드)
+await client.zAdd('leaderboard', { score: 1500, value: 'user:123' });
+const top10 = await client.zRangeWithScores('leaderboard', 0, 9, { REV: true });</code></pre>
+
+        <h2>언제 무엇을 선택할까?</h2>
+        <pre><code class="language-text">SQL (PostgreSQL, MySQL)을 선택할 때:
+✅ 데이터 간 복잡한 관계가 많을 때 (ERP, 금융)
+✅ 트랜잭션 일관성이 중요할 때 (주문, 결제)
+✅ 데이터 구조가 명확하고 잘 변하지 않을 때
+✅ 복잡한 쿼리, 집계, 리포팅이 필요할 때
+
+MongoDB를 선택할 때:
+✅ 데이터 구조가 유연하거나 자주 바뀔 때
+✅ 문서 형태 데이터 (블로그 글, 상품 카탈로그)
+✅ 빠른 프로토타이핑이 필요할 때
+✅ 스케일 아웃(수평 확장)이 중요할 때
+
+Redis를 선택할 때:
+✅ 세션, 캐시, 임시 데이터 저장
+✅ 실시간 순위표, 카운터
+✅ 메시지 큐, Pub/Sub
+✅ 응답 속도가 ms 단위여야 할 때</code></pre>
+
+        <h2>인덱스 — 성능의 핵심</h2>
+        <pre><code class="language-sql">-- 자주 검색하는 컬럼에 인덱스 추가
+CREATE INDEX idx_posts_user_id ON posts(user_id);
+CREATE INDEX idx_posts_created ON posts(created_at DESC);
+
+-- 복합 인덱스 (조건에 자주 함께 등장하는 컬럼)
+CREATE INDEX idx_posts_user_published
+ON posts(user_id, published)
+WHERE published = TRUE;  -- 부분 인덱스
+
+-- 인덱스 활용 여부 확인
+EXPLAIN ANALYZE
+SELECT * FROM posts WHERE user_id = 1 AND published = TRUE;</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          SQL은 데이터 일관성과 복잡한 관계, NoSQL은 유연한 스키마와 수평 확장에 강합니다. 많은 실제 서비스는 둘을 함께 사용합니다: PostgreSQL로 핵심 비즈니스 데이터를 관리하고, Redis로 캐시/세션을 처리합니다. 인덱스 설계는 쿼리 성능에 결정적인 영향을 미치므로 반드시 EXPLAIN으로 검증하세요.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

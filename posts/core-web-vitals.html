@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Core Web Vitals로 성능 최적화하기 — LCP, INP, CLS — Devlog</title>
+  <meta name="description" content="Google의 Core Web Vitals(LCP, INP, CLS)를 측정하고 개선하는 실전 성능 최적화 가이드입니다. SEO 점수와 사용자 경험을 동시에 높이세요.">
+  <meta property="og:title" content="Core Web Vitals로 성능 최적화하기 — Devlog">
+  <meta property="og:description" content="Google의 Core Web Vitals(LCP, INP, CLS)를 측정하고 개선하는 실전 성능 최적화 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">Performance</span><span class="tag">Web</span></div>
+        <h1 class="post-h1">Core Web Vitals로 성능 최적화하기 — LCP, INP, CLS</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 07</span>
+          <span>⏱ 10분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>Google은 사용자 경험을 측정하는 <strong>Core Web Vitals</strong>를 검색 순위 신호로 활용합니다. LCP(최대 콘텐츠 페인트), INP(다음 페인트까지의 상호작용), CLS(누적 레이아웃 이동) 세 가지 지표를 이해하고 개선하면 SEO와 사용자 경험을 동시에 향상시킬 수 있습니다.</p>
+
+        <h2>LCP — Largest Contentful Paint (목표: 2.5초 이내)</h2>
+        <p>화면에서 가장 큰 이미지나 텍스트 블록이 렌더링되는 시간입니다. 대부분 히어로 이미지나 H1 제목이 해당됩니다.</p>
+        <pre><code class="language-html">&lt;!-- LCP 개선 1: 히어로 이미지 preload --&gt;
+&lt;link rel="preload" as="image"
+  href="/hero.webp"
+  imagesrcset="/hero-400.webp 400w, /hero-800.webp 800w"
+  imagesizes="100vw"&gt;
+
+&lt;!-- LCP 개선 2: fetchpriority 힌트 --&gt;
+&lt;img src="/hero.webp" fetchpriority="high" alt="히어로 이미지"&gt;
+
+&lt;!-- LCP 개선 3: LCP 이미지에는 lazy loading 금지 --&gt;
+&lt;!-- 나쁜 예 --&gt;
+&lt;img src="/hero.webp" loading="lazy"&gt;
+&lt;!-- 좋은 예 --&gt;
+&lt;img src="/hero.webp" loading="eager"&gt;</code></pre>
+
+        <pre><code class="language-html">&lt;!-- LCP 개선 4: 이미지 형식 최적화 --&gt;
+&lt;picture&gt;
+  &lt;source type="image/avif" srcset="/hero.avif"&gt;
+  &lt;source type="image/webp" srcset="/hero.webp"&gt;
+  &lt;img src="/hero.jpg" alt="히어로"
+       width="1400" height="500"&gt;  &lt;!-- width/height 반드시 명시 --&gt;
+&lt;/picture&gt;</code></pre>
+
+        <h2>INP — Interaction to Next Paint (목표: 200ms 이내)</h2>
+        <p>사용자 상호작용(클릭, 키입력)에서 다음 화면 업데이트까지 걸리는 시간입니다. 2024년 FID를 대체했습니다.</p>
+        <pre><code class="language-javascript">// INP 개선 1: 긴 작업(Long Task) 분리
+// 나쁜 예 — 메인 스레드 블로킹
+function processLargeList(items) {
+  items.forEach(item => heavyComputation(item));
+}
+
+// 좋은 예 — yield로 메인 스레드 해방
+async function processLargeList(items) {
+  for (const item of items) {
+    heavyComputation(item);
+    // 50ms마다 메인 스레드에 제어권 반환
+    if (performance.now() % 50 < 1) {
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }
+}
+
+// INP 개선 2: 이벤트 핸들러 최적화
+button.addEventListener('click', () => {
+  // 즉시 시각 피드백 제공
+  button.disabled = true;
+  button.textContent = '처리 중...';
+
+  // 무거운 작업은 비동기로
+  requestAnimationFrame(() => {
+    performHeavyTask();
+  });
+});</code></pre>
+
+        <h2>CLS — Cumulative Layout Shift (목표: 0.1 이하)</h2>
+        <p>페이지 로드 중 요소들이 갑자기 움직이는 정도입니다. 이미지 크기 미지정, 늦게 로드되는 광고, 동적 콘텐츠가 주요 원인입니다.</p>
+        <pre><code class="language-html">&lt;!-- CLS 개선 1: 이미지/영상 크기 항상 명시 --&gt;
+&lt;img src="thumbnail.jpg" width="640" height="360" alt="썸네일"&gt;
+
+&lt;!-- 또는 CSS aspect-ratio 사용 --&gt;</code></pre>
+
+        <pre><code class="language-css">/* CLS 개선 2: aspect-ratio로 공간 미리 확보 */
+.thumbnail {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* CLS 개선 3: 폰트 로딩 중 레이아웃 변화 방지 */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard.woff2') format('woff2');
+  font-display: optional; /* 폰트 없으면 시스템 폰트 유지 */
+}
+
+/* CLS 개선 4: 광고 영역 크기 고정 */
+.ad-slot {
+  min-height: 250px;
+  background: #f5f5f5;
+}</code></pre>
+
+        <h2>성능 측정 도구</h2>
+        <pre><code class="language-javascript">// Web Vitals 라이브러리로 실제 사용자 데이터 수집
+import { onLCP, onINP, onCLS } from 'web-vitals';
+
+function sendToAnalytics({ name, value, rating }) {
+  console.log(`${name}: ${value}ms (${rating})`);
+  // GA4, DataDog 등으로 전송
+}
+
+onLCP(sendToAnalytics);
+onINP(sendToAnalytics);
+onCLS(sendToAnalytics);</code></pre>
+
+        <h2>리소스 우선순위 힌트</h2>
+        <pre><code class="language-html">&lt;!-- DNS 미리 연결 --&gt;
+&lt;link rel="dns-prefetch" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+
+&lt;!-- 핵심 리소스 미리 로드 --&gt;
+&lt;link rel="preload" href="/fonts/pretendard.woff2" as="font" crossorigin&gt;
+&lt;link rel="preload" href="/critical.css" as="style"&gt;
+
+&lt;!-- 다음 페이지 미리 가져오기 --&gt;
+&lt;link rel="prefetch" href="/posts/next-article.html"&gt;
+
+&lt;!-- 중요하지 않은 스크립트 지연 로드 --&gt;
+&lt;script src="/analytics.js" defer&gt;&lt;/script&gt;
+&lt;script src="/chat-widget.js" async&gt;&lt;/script&gt;</code></pre>
+
+        <h2>Critical CSS 인라인</h2>
+        <pre><code class="language-html">&lt;!-- 첫 화면에 필요한 CSS만 인라인으로 --&gt;
+&lt;style&gt;
+  /* Above-the-fold 스타일만 포함 */
+  body { margin: 0; font-family: system-ui; }
+  .header { position: sticky; top: 0; background: #fff; }
+  .hero { height: 500px; background: #6891f8; }
+&lt;/style&gt;
+
+&lt;!-- 나머지 CSS는 비동기 로드 --&gt;
+&lt;link rel="stylesheet" href="/style.css" media="print" onload="this.media='all'"&gt;</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          LCP는 히어로 이미지 preload와 WebP/AVIF 형식으로 개선하세요. INP는 긴 작업을 분리하고 즉시 시각 피드백을 제공하세요. CLS는 이미지와 광고 영역의 크기를 미리 확보하세요. PageSpeed Insights와 Chrome DevTools의 Performance 탭으로 정기적으로 측정하고 개선하는 것이 중요합니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

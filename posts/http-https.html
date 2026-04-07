@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HTTP/HTTPS 완전 이해하기 — 요청과 응답의 모든 것 — Devlog</title>
+  <meta name="description" content="HTTP 메서드, 상태 코드, 헤더, HTTPS 암호화까지 웹 통신의 기본 원리를 실전 예제로 완전히 이해하는 가이드입니다.">
+  <meta property="og:title" content="HTTP/HTTPS 완전 이해하기 — Devlog">
+  <meta property="og:description" content="HTTP 메서드, 상태 코드, 헤더, HTTPS 암호화까지 웹 통신의 기본 원리를 실전 예제로 완전히 이해하는 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">Web</span><span class="tag">Network</span></div>
+        <h1 class="post-h1">HTTP/HTTPS 완전 이해하기 — 요청과 응답의 모든 것</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 07</span>
+          <span>⏱ 10분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>브라우저에 URL을 입력하고 Enter를 누르는 순간, 수십 개의 HTTP 요청이 오가며 페이지가 만들어집니다. <strong>HTTP(HyperText Transfer Protocol)</strong>는 웹의 기반이 되는 통신 규약입니다. 이를 제대로 이해하면 API 설계, 성능 최적화, 보안까지 폭넓게 활용할 수 있습니다.</p>
+
+        <h2>HTTP 요청 구조</h2>
+        <pre><code class="language-http">GET /api/posts/1 HTTP/1.1
+Host: api.devlog.kr
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)
+</code></pre>
+        <p>요청은 <strong>메서드 + 경로 + 버전</strong>으로 시작하고, 그 아래 헤더들이 이어집니다. POST/PUT은 헤더 아래 빈 줄 다음에 본문(body)이 옵니다.</p>
+
+        <h2>HTTP 메서드</h2>
+        <pre><code class="language-javascript">// GET — 리소스 조회 (멱등, 캐시 가능)
+fetch('/api/posts')
+
+// POST — 리소스 생성 (멱등 아님)
+fetch('/api/posts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: '새 글', content: '...' })
+})
+
+// PUT — 리소스 전체 교체 (멱등)
+fetch('/api/posts/1', {
+  method: 'PUT',
+  body: JSON.stringify({ title: '수정된 글', content: '...' })
+})
+
+// PATCH — 리소스 일부 수정 (멱등)
+fetch('/api/posts/1', {
+  method: 'PATCH',
+  body: JSON.stringify({ title: '제목만 수정' })
+})
+
+// DELETE — 리소스 삭제 (멱등)
+fetch('/api/posts/1', { method: 'DELETE' })</code></pre>
+
+        <h2>HTTP 상태 코드</h2>
+        <pre><code class="language-javascript">// 2xx — 성공
+200 OK           // 요청 성공
+201 Created      // 리소스 생성 성공 (POST 응답)
+204 No Content   // 성공, 응답 본문 없음 (DELETE 응답)
+
+// 3xx — 리다이렉트
+301 Moved Permanently  // 영구 이동 (SEO에 영향)
+302 Found              // 임시 이동
+304 Not Modified       // 캐시 사용 가능
+
+// 4xx — 클라이언트 오류
+400 Bad Request        // 잘못된 요청 (유효성 오류)
+401 Unauthorized       // 인증 필요 (로그인 안 함)
+403 Forbidden          // 권한 없음 (로그인은 했으나 접근 불가)
+404 Not Found          // 리소스 없음
+409 Conflict           // 리소스 충돌 (중복 이메일 등)
+422 Unprocessable      // 유효성 검사 실패
+429 Too Many Requests  // 요청 횟수 초과 (Rate Limit)
+
+// 5xx — 서버 오류
+500 Internal Server Error  // 서버 내부 오류
+502 Bad Gateway            // 게이트웨이 오류
+503 Service Unavailable    // 서버 과부하 / 점검 중</code></pre>
+
+        <h2>주요 HTTP 헤더</h2>
+        <pre><code class="language-http">--- 요청 헤더 ---
+Content-Type: application/json        # 요청 본문 형식
+Accept: application/json, text/html   # 받고 싶은 형식
+Authorization: Bearer <token>         # 인증 토큰
+Cache-Control: no-cache               # 캐시 정책
+Cookie: session=abc123                # 쿠키 전송
+
+--- 응답 헤더 ---
+Content-Type: application/json; charset=utf-8
+Cache-Control: max-age=3600, public   # 1시간 캐시
+ETag: "abc123"                        # 리소스 버전 식별자
+Set-Cookie: session=xyz; HttpOnly; Secure; SameSite=Strict
+Access-Control-Allow-Origin: *        # CORS 허용
+X-RateLimit-Remaining: 95            # 남은 요청 횟수</code></pre>
+
+        <h2>HTTPS와 TLS 암호화</h2>
+        <p>HTTPS는 HTTP에 <strong>TLS(Transport Layer Security)</strong> 암호화를 더한 것입니다. 데이터가 암호화되어 전송되므로 중간자 공격(MITM)을 방어합니다.</p>
+        <pre><code class="language-text">TLS 핸드셰이크 과정:
+1. 클라이언트 → 서버: "TLS 1.3 지원해요, 이런 암호화 방식 씁니다"
+2. 서버 → 클라이언트: "인증서 여기요, 이 방식 쓰죠"
+3. 클라이언트: 인증서 검증 (CA 서명 확인)
+4. 키 교환 (Diffie-Hellman) → 세션 키 생성
+5. 이후 모든 통신은 세션 키로 대칭 암호화</code></pre>
+
+        <h2>CORS — 교차 출처 리소스 공유</h2>
+        <pre><code class="language-javascript">// 브라우저는 다른 출처의 API 요청을 기본 차단
+// Origin: http://localhost:3000 → API: http://api.devlog.kr
+// → CORS 오류 발생
+
+// 서버에서 허용 헤더 추가 (Express 예시)
+const cors = require('cors');
+app.use(cors({
+  origin: ['https://devlog.kr', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true  // 쿠키 포함 요청 허용
+}));
+
+// Preflight 요청 (OPTIONS)
+// 브라우저가 실제 요청 전에 서버에 "이 요청 해도 돼?" 확인
+// 서버가 Access-Control-Allow-* 헤더로 응답해야 함</code></pre>
+
+        <h2>HTTP/2와 HTTP/3</h2>
+        <pre><code class="language-text">HTTP/1.1 (1997)
+- 요청당 하나의 TCP 연결
+- 헤더 압축 없음
+- 텍스트 기반 프로토콜
+
+HTTP/2 (2015)
+- 하나의 연결로 여러 요청 병렬 처리 (멀티플렉싱)
+- 헤더 압축 (HPACK)
+- 서버 푸시 가능
+- 바이너리 프로토콜
+
+HTTP/3 (2022)
+- UDP 기반 QUIC 프로토콜 사용
+- 연결 설정 시간 단축 (0-RTT)
+- 패킷 손실 시 다른 스트림 영향 없음</code></pre>
+
+        <h2>캐싱 전략</h2>
+        <pre><code class="language-http">--- 자주 바뀌지 않는 정적 파일 ---
+Cache-Control: public, max-age=31536000, immutable
+# 1년 캐시, 내용 변경 없음 → 파일명에 해시 포함 (app.abc123.js)
+
+--- HTML 파일 ---
+Cache-Control: no-cache
+# 매번 서버에 확인, 변경 없으면 304 반환
+
+--- API 응답 ---
+Cache-Control: private, max-age=300
+# 브라우저만 5분 캐시
+
+--- ETag 활용 ---
+# 서버: ETag: "version-123"
+# 클라이언트 재요청: If-None-Match: "version-123"
+# 변경 없으면: 304 Not Modified (본문 없이)</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          HTTP는 요청-응답 구조의 무상태 프로토콜입니다. 올바른 메서드(GET/POST/PUT/PATCH/DELETE)와 상태 코드(2xx/4xx/5xx)를 사용하고, HTTPS로 통신을 암호화하세요. 캐싱 전략으로 불필요한 요청을 줄이면 성능이 크게 향상됩니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

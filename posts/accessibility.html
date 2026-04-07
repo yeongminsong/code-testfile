@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>웹 접근성(A11y) 실천 가이드 — Devlog</title>
+  <meta name="description" content="ARIA 속성, 키보드 네비게이션, 색상 대비, 스크린 리더 지원까지 웹 접근성을 실무에 바로 적용하는 실천 가이드입니다.">
+  <meta property="og:title" content="웹 접근성(A11y) 실천 가이드 — Devlog">
+  <meta property="og:description" content="ARIA 속성, 키보드 네비게이션, 색상 대비, 스크린 리더 지원까지 웹 접근성을 실무에 바로 적용하는 실천 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1200&h=630&fit=crop">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags"><span class="tag">Web</span><span class="tag">UX</span></div>
+        <h1 class="post-h1">웹 접근성(A11y) 실천 가이드</h1>
+        <div class="post-meta">
+          <span>📅 2026. 03. 22</span>
+          <span>⏱ 8분 읽기</span>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>웹 접근성(Accessibility, A11y)은 장애가 있는 사람을 포함한 <strong>모든 사용자</strong>가 웹을 이용할 수 있도록 보장하는 것입니다. 시각 장애인의 스크린 리더, 지체 장애인의 키보드 전용 탐색 등 다양한 사용 환경을 고려해야 합니다. 접근성을 지키면 SEO도 함께 좋아집니다.</p>
+
+        <h2>시맨틱 HTML — 기본 중의 기본</h2>
+        <pre><code class="language-html">&lt;!-- 나쁜 예 --&gt;
+&lt;div class="header"&gt;
+  &lt;div class="nav"&gt;
+    &lt;div onclick="go('/')"&gt;홈&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 좋은 예 --&gt;
+&lt;header&gt;
+  &lt;nav aria-label="주요 메뉴"&gt;
+    &lt;a href="/"&gt;홈&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;
+
+&lt;main&gt;
+  &lt;article&gt;
+    &lt;h1&gt;제목&lt;/h1&gt;
+    &lt;p&gt;내용&lt;/p&gt;
+  &lt;/article&gt;
+&lt;/main&gt;
+
+&lt;footer&gt;
+  &lt;address&gt;contact@devlog.kr&lt;/address&gt;
+&lt;/footer&gt;</code></pre>
+
+        <h2>이미지 alt 텍스트</h2>
+        <pre><code class="language-html">&lt;!-- 정보를 전달하는 이미지 --&gt;
+&lt;img src="chart.png" alt="2026년 1분기 매출이 전년 대비 23% 상승한 막대 그래프"&gt;
+
+&lt;!-- 장식용 이미지 (스크린 리더가 무시) --&gt;
+&lt;img src="divider.png" alt=""&gt;
+
+&lt;!-- 기능 버튼의 아이콘 --&gt;
+&lt;button aria-label="메뉴 닫기"&gt;
+  &lt;img src="close.svg" alt=""&gt;
+&lt;/button&gt;</code></pre>
+
+        <h2>키보드 접근성</h2>
+        <pre><code class="language-html">&lt;!-- 클릭 가능한 요소는 button 또는 a 사용 --&gt;
+&lt;button onclick="openModal()"&gt;모달 열기&lt;/button&gt;
+
+&lt;!-- div를 버튼처럼 쓸 때 (최후의 수단) --&gt;
+&lt;div
+  role="button"
+  tabindex="0"
+  onclick="openModal()"
+  onkeydown="if(event.key==='Enter'||event.key===' ')openModal()"
+&gt;모달 열기&lt;/div&gt;
+
+&lt;!-- 포커스 표시 절대 제거하지 말 것 --&gt;</code></pre>
+        <pre><code class="language-css">/* 절대 금지 */
+* { outline: none; }
+
+/* 대신 커스텀 포커스 스타일 */
+:focus-visible {
+  outline: 2px solid #6891f8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}</code></pre>
+
+        <h2>ARIA 속성 활용</h2>
+        <pre><code class="language-html">&lt;!-- 모달 --&gt;
+&lt;div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  aria-describedby="modal-desc"
+&gt;
+  &lt;h2 id="modal-title"&gt;확인&lt;/h2&gt;
+  &lt;p id="modal-desc"&gt;정말 삭제하시겠습니까?&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- 상태 알림 --&gt;
+&lt;div role="status" aria-live="polite"&gt;
+  저장되었습니다.
+&lt;/div&gt;
+
+&lt;!-- 확장/축소 버튼 --&gt;
+&lt;button aria-expanded="false" aria-controls="menu"&gt;메뉴&lt;/button&gt;
+&lt;ul id="menu" hidden&gt;...&lt;/ul&gt;</code></pre>
+
+        <h2>색상 대비</h2>
+        <p>WCAG 2.1 기준으로 일반 텍스트는 <strong>4.5:1</strong>, 큰 텍스트(18px 이상)는 <strong>3:1</strong> 이상의 명암 대비가 필요합니다.</p>
+        <pre><code class="language-css">/* 나쁜 예 — 대비 부족 */
+.subtle { color: #aaa; background: #fff; } /* 2.3:1 */
+
+/* 좋은 예 */
+.readable { color: #595959; background: #fff; } /* 7:1 */
+
+/* OKLCH로 접근성 있는 색상 선택 */
+.text-muted { color: oklch(45% 0.05 240); } /* 충분한 대비 */</code></pre>
+
+        <h2>폼 접근성</h2>
+        <pre><code class="language-html">&lt;form&gt;
+  &lt;div&gt;
+    &lt;!-- label과 input을 반드시 연결 --&gt;
+    &lt;label for="email"&gt;이메일 &lt;span aria-hidden="true"&gt;*&lt;/span&gt;&lt;/label&gt;
+    &lt;input
+      type="email"
+      id="email"
+      name="email"
+      required
+      aria-required="true"
+      aria-describedby="email-hint email-error"
+    &gt;
+    &lt;span id="email-hint"&gt;예: hello@example.com&lt;/span&gt;
+    &lt;span id="email-error" role="alert"&gt;&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</code></pre>
+
+        <div class="callout">
+          <strong>접근성 체크리스트</strong><br>
+          ✅ 모든 이미지에 적절한 alt 텍스트<br>
+          ✅ 키보드만으로 전체 사이트 탐색 가능<br>
+          ✅ 포커스 표시 스타일 명확히<br>
+          ✅ 색상만으로 정보 전달 금지<br>
+          ✅ 폼 요소에 label 연결<br>
+          ✅ 명암 대비 4.5:1 이상 확인
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

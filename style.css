@@ -677,6 +677,7 @@ a { color: inherit; text-decoration: none; }
 .form-textarea { min-height: 130px; resize: vertical; }
 
 .contact-form { max-width: 640px; }
+.form-notice { margin-top: 0.75rem; font-size: 0.9rem; font-weight: 600; }
 
 /* ── Auth Page ── */
 .auth-page { background-color: var(--bg-gray); }

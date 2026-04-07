@@ -109,9 +109,37 @@ signupForm?.addEventListener('submit', e => {
   alert('회원가입이 완료되었습니다!');
 });
 
-// ── About: Contact Form ──
-document.querySelector('.contact-form')?.addEventListener('submit', e => {
+// ── About: Contact Form (Formspree) ──
+document.querySelector('.contact-form')?.addEventListener('submit', async e => {
   e.preventDefault();
-  alert('메시지가 전송되었습니다. 감사합니다!');
-  e.target.reset();
+  const form = e.target;
+  const notice = document.getElementById('formNotice');
+  const btn = form.querySelector('button[type="submit"]');
+
+  btn.disabled = true;
+  btn.textContent = '전송 중...';
+
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { Accept: 'application/json' },
+    });
+
+    if (res.ok) {
+      notice.textContent = '✅ 메시지가 전송되었습니다. 감사합니다!';
+      notice.style.color = '#2ED573';
+      notice.style.display = 'block';
+      form.reset();
+    } else {
+      throw new Error();
+    }
+  } catch {
+    notice.textContent = '❌ 전송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+    notice.style.color = '#EA5B5B';
+    notice.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '보내기';
+  }
 });

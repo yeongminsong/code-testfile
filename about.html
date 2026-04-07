@@ -114,22 +114,23 @@
     <!-- Contact -->
     <section class="about-section">
       <h2 class="section-title">연락하기</h2>
-      <form class="contact-form">
+      <form class="contact-form" action="https://formspree.io/f/mdapbdv" method="POST">
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">이름</label>
-            <input type="text" class="form-input" placeholder="홍길동">
+            <input type="text" name="name" class="form-input" placeholder="홍길동" required>
           </div>
           <div class="form-group">
             <label class="form-label">이메일</label>
-            <input type="email" class="form-input" placeholder="hello@example.com">
+            <input type="email" name="email" class="form-input" placeholder="hello@example.com" required>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">메시지</label>
-          <textarea class="form-input form-textarea" placeholder="안녕하세요! ..."></textarea>
+          <textarea name="message" class="form-input form-textarea" placeholder="안녕하세요! ..." required></textarea>
         </div>
         <button type="submit" class="btn-primary" style="width:100%;">보내기</button>
+        <p class="form-notice" id="formNotice" style="display:none;"></p>
       </form>
     </section>
 

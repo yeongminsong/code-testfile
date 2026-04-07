@@ -1,3 +1,4 @@
+// Theme toggle
 const toggle = document.getElementById('themeToggle');
 const html = document.documentElement;
 
@@ -10,4 +11,12 @@ toggle.addEventListener('click', () => {
   html.setAttribute('data-theme', next);
   localStorage.setItem('theme', next);
   toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+
+// Category filter
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
 });

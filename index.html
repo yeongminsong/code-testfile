@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Devlog — 개발 이야기</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
   <link href="/style.css" rel="stylesheet">
 </head>
 <body>
@@ -13,50 +13,64 @@
   <!-- Header -->
   <header class="site-header">
     <div class="header-inner">
-      <a href="#" class="logo">✦ Devlog</a>
+      <a href="#" class="logo">Devlog</a>
       <nav class="nav">
         <a href="#">홈</a>
         <a href="#">카테고리</a>
         <a href="#">태그</a>
         <a href="#">소개</a>
       </nav>
-      <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="#" class="btn-login">로그인</a>
+      </div>
     </div>
   </header>
 
   <!-- Hero -->
   <section class="hero">
     <div class="hero-inner">
-      <span class="hero-label">Featured Post</span>
-      <h1 class="hero-title">웹 컴포넌트로 만드는<br>재사용 가능한 UI</h1>
-      <p class="hero-desc">Shadow DOM, Custom Elements, HTML Templates를 활용해 프레임워크 없이도 강력한 컴포넌트를 만드는 방법을 알아봅니다.</p>
-      <div class="hero-meta">
-        <span class="tag">Web</span>
-        <span class="tag">JavaScript</span>
-        <span class="dot">·</span>
-        <span class="date">2026. 04. 07</span>
+      <p class="hero-sub">개발자를 위한 기술 블로그</p>
+      <h1 class="hero-title">더 나은 코드를 위한<br>지식과 경험을 공유합니다</h1>
+      <p class="hero-desc">웹 개발, CSS, JavaScript, DevOps까지<br>실전에서 얻은 인사이트를 정리합니다.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn-primary">글 둘러보기</a>
+        <a href="#" class="btn-secondary">소개 보기</a>
       </div>
-      <a href="#" class="btn-read">읽어보기 →</a>
     </div>
   </section>
 
-  <!-- Posts Grid -->
+  <!-- Category Tabs -->
+  <section class="category-bar">
+    <div class="category-inner">
+      <button class="cat-btn active">전체</button>
+      <button class="cat-btn">JavaScript</button>
+      <button class="cat-btn">CSS</button>
+      <button class="cat-btn">Web</button>
+      <button class="cat-btn">DevOps</button>
+      <button class="cat-btn">Git</button>
+    </div>
+  </section>
+
+  <!-- Posts -->
   <main class="main-content">
-    <h2 class="section-title">최근 글</h2>
     <div class="posts-grid">
 
-      <article class="post-card">
-        <div class="post-thumb thumb-1"></div>
+      <!-- Featured -->
+      <article class="post-card featured">
+        <div class="post-thumb thumb-1">
+          <span class="featured-badge">Featured</span>
+        </div>
         <div class="post-body">
           <div class="post-tags">
-            <span class="tag">CSS</span>
-            <span class="tag">Design</span>
+            <span class="tag">Web</span>
+            <span class="tag">JavaScript</span>
           </div>
-          <h3 class="post-title">OKLCH로 더 나은 색상 시스템 만들기</h3>
-          <p class="post-excerpt">기존 HEX, RGB의 한계를 넘어 지각적으로 균일한 색상 공간인 OKLCH를 활용해보세요.</p>
+          <h3 class="post-title">웹 컴포넌트로 만드는 재사용 가능한 UI</h3>
+          <p class="post-excerpt">Shadow DOM, Custom Elements, HTML Templates를 활용해 프레임워크 없이도 강력한 컴포넌트를 만드는 방법을 알아봅니다.</p>
           <div class="post-footer">
-            <span class="date">2026. 04. 05</span>
-            <a href="#" class="read-more">읽기 →</a>
+            <span class="date">2026. 04. 07</span>
+            <a href="#" class="read-more">자세히 보기 →</a>
           </div>
         </div>
       </article>
@@ -64,14 +78,12 @@
       <article class="post-card">
         <div class="post-thumb thumb-2"></div>
         <div class="post-body">
-          <div class="post-tags">
-            <span class="tag">JavaScript</span>
-          </div>
-          <h3 class="post-title">LocalStorage vs SessionStorage 언제 무엇을 쓸까</h3>
-          <p class="post-excerpt">브라우저 저장소의 차이점을 명확히 이해하고, 다크모드 같은 사용자 설정을 올바르게 저장하는 방법을 살펴봅니다.</p>
+          <div class="post-tags"><span class="tag">CSS</span><span class="tag">Design</span></div>
+          <h3 class="post-title">OKLCH로 더 나은 색상 시스템 만들기</h3>
+          <p class="post-excerpt">기존 HEX, RGB의 한계를 넘어 지각적으로 균일한 색상 공간을 활용해보세요.</p>
           <div class="post-footer">
-            <span class="date">2026. 04. 03</span>
-            <a href="#" class="read-more">읽기 →</a>
+            <span class="date">2026. 04. 05</span>
+            <a href="#" class="read-more">자세히 보기 →</a>
           </div>
         </div>
       </article>
@@ -79,15 +91,12 @@
       <article class="post-card">
         <div class="post-thumb thumb-3"></div>
         <div class="post-body">
-          <div class="post-tags">
-            <span class="tag">Git</span>
-            <span class="tag">DevOps</span>
-          </div>
-          <h3 class="post-title">Git Push로 자동 배포하기</h3>
-          <p class="post-excerpt">GitHub Actions 없이도 git push 한 번으로 서버에 자동 배포되는 환경을 구성하는 방법입니다.</p>
+          <div class="post-tags"><span class="tag">JavaScript</span></div>
+          <h3 class="post-title">LocalStorage vs SessionStorage 언제 무엇을 쓸까</h3>
+          <p class="post-excerpt">브라우저 저장소의 차이를 명확히 이해하고 올바르게 활용하는 방법을 살펴봅니다.</p>
           <div class="post-footer">
-            <span class="date">2026. 04. 01</span>
-            <a href="#" class="read-more">읽기 →</a>
+            <span class="date">2026. 04. 03</span>
+            <a href="#" class="read-more">자세히 보기 →</a>
           </div>
         </div>
       </article>
@@ -95,14 +104,12 @@
       <article class="post-card">
         <div class="post-thumb thumb-4"></div>
         <div class="post-body">
-          <div class="post-tags">
-            <span class="tag">CSS</span>
-          </div>
-          <h3 class="post-title">CSS @layer로 스타일 우선순위 정복하기</h3>
-          <p class="post-excerpt">!important 없이도 스타일 충돌을 해결하는 @layer의 동작 원리와 실전 활용법을 정리합니다.</p>
+          <div class="post-tags"><span class="tag">Git</span><span class="tag">DevOps</span></div>
+          <h3 class="post-title">Git Push로 자동 배포하기</h3>
+          <p class="post-excerpt">git push 한 번으로 서버에 자동 배포되는 환경을 구성하는 방법입니다.</p>
           <div class="post-footer">
-            <span class="date">2026. 03. 28</span>
-            <a href="#" class="read-more">읽기 →</a>
+            <span class="date">2026. 04. 01</span>
+            <a href="#" class="read-more">자세히 보기 →</a>
           </div>
         </div>
       </article>
@@ -110,15 +117,12 @@
       <article class="post-card">
         <div class="post-thumb thumb-5"></div>
         <div class="post-body">
-          <div class="post-tags">
-            <span class="tag">Web</span>
-            <span class="tag">Performance</span>
-          </div>
-          <h3 class="post-title">폰트 로딩 최적화 완벽 가이드</h3>
-          <p class="post-excerpt">FOUT, FOIT를 없애고 font-display, preconnect, 서브셋 폰트로 로딩 성능을 끌어올립니다.</p>
+          <div class="post-tags"><span class="tag">CSS</span></div>
+          <h3 class="post-title">CSS @layer로 스타일 우선순위 정복하기</h3>
+          <p class="post-excerpt">!important 없이도 스타일 충돌을 해결하는 @layer의 동작 원리와 실전 활용법.</p>
           <div class="post-footer">
-            <span class="date">2026. 03. 25</span>
-            <a href="#" class="read-more">읽기 →</a>
+            <span class="date">2026. 03. 28</span>
+            <a href="#" class="read-more">자세히 보기 →</a>
           </div>
         </div>
       </article>
@@ -126,25 +130,33 @@
       <article class="post-card">
         <div class="post-thumb thumb-6"></div>
         <div class="post-body">
-          <div class="post-tags">
-            <span class="tag">JavaScript</span>
-            <span class="tag">UX</span>
-          </div>
-          <h3 class="post-title">다크모드 구현의 모든 것</h3>
-          <p class="post-excerpt">CSS 변수, prefers-color-scheme, localStorage를 조합해 완성도 높은 다크모드를 구현합니다.</p>
+          <div class="post-tags"><span class="tag">Web</span><span class="tag">Performance</span></div>
+          <h3 class="post-title">폰트 로딩 최적화 완벽 가이드</h3>
+          <p class="post-excerpt">FOUT, FOIT를 없애고 font-display, preconnect로 로딩 성능을 끌어올립니다.</p>
           <div class="post-footer">
-            <span class="date">2026. 03. 20</span>
-            <a href="#" class="read-more">읽기 →</a>
+            <span class="date">2026. 03. 25</span>
+            <a href="#" class="read-more">자세히 보기 →</a>
           </div>
         </div>
       </article>
 
     </div>
+
+    <div class="load-more-wrap">
+      <button class="btn-load-more">더 보기</button>
+    </div>
   </main>
 
   <!-- Footer -->
   <footer class="site-footer">
-    <p>© 2026 Devlog · 즐겁게 만들고 기록합니다.</p>
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
   </footer>
 
   <script src="/main.js"></script>

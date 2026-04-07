@@ -1,1 +1,81 @@
-/* Add styles here */
+@layer base, components;
+
+@layer base {
+  :root {
+    --background-color: oklch(98% 0.02 240);
+    --text-color: oklch(25% 0.15 240);
+    --accent-color: oklch(65% 0.25 290);
+    --surface-color: oklch(99% 0.01 240);
+    --shadow-color: oklch(20% 0.1 240 / 40%);
+
+    --font-family-base: 'Pretendard', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-family-base);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: grid;
+    place-content: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%239C92AC' fill-opacity='0.15' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+
+  }
+
+  main {
+    padding: 2rem;
+  }
+}
+
+@layer components {
+  lunch-recommender {
+    display: block;
+    container-type: inline-size;
+    background-color: var(--surface-color);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow:
+      0 2.8px 2.2px var(--shadow-color),
+      0 6.7px 5.3px var(--shadow-color),
+      0 12.5px 10px var(--shadow-color),
+      0 22.3px 17.9px var(--shadow-color),
+      0 41.8px 33.4px var(--shadow-color),
+      0 100px 80px var(--shadow-color);
+    max-width: 400px;
+    text-align: center;
+
+    h1 {
+      font-size: clamp(2rem, 10cqi, 3rem);
+      margin-block-start: 0;
+      color: var(--accent-color);
+    }
+
+    .menu-display {
+      min-height: 5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      display: grid;
+      place-content: center;
+      margin-block: 2rem;
+    }
+
+    button {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 6px oklch(20% 0.1 290 / 30%);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px oklch(20% 0.1 290 / 40%);
+      }
+    }
+  }
+}

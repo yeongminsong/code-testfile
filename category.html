@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>카테고리 — Devlog</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html" class="nav-active">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <h1 class="page-title">카테고리</h1>
+      <p class="page-desc">관심 있는 주제의 글을 골라 읽어보세요.</p>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <div class="category-grid">
+
+      <div class="category-card" data-cat="javascript">
+        <div class="cat-icon" style="background: linear-gradient(135deg,#f7df1e,#f0a500);">JS</div>
+        <div class="cat-info">
+          <h2 class="cat-name">JavaScript</h2>
+          <p class="cat-desc">ES6+, 비동기, 웹 API, 브라우저 저장소 등</p>
+          <span class="cat-count">3개 글</span>
+        </div>
+      </div>
+
+      <div class="category-card" data-cat="css">
+        <div class="cat-icon" style="background: linear-gradient(135deg,#264de4,#2965f1);">CSS</div>
+        <div class="cat-info">
+          <h2 class="cat-name">CSS</h2>
+          <p class="cat-desc">레이아웃, 애니메이션, 색상 시스템, @layer 등</p>
+          <span class="cat-count">2개 글</span>
+        </div>
+      </div>
+
+      <div class="category-card" data-cat="web">
+        <div class="cat-icon" style="background: linear-gradient(135deg,#6891f8,#a78bfa);">Web</div>
+        <div class="cat-info">
+          <h2 class="cat-name">Web</h2>
+          <p class="cat-desc">웹 컴포넌트, 성능 최적화, 접근성 등</p>
+          <span class="cat-count">2개 글</span>
+        </div>
+      </div>
+
+      <div class="category-card" data-cat="devops">
+        <div class="cat-icon" style="background: linear-gradient(135deg,#43e97b,#38f9d7);">Ops</div>
+        <div class="cat-info">
+          <h2 class="cat-name">DevOps</h2>
+          <p class="cat-desc">Git, 배포 자동화, CI/CD 등</p>
+          <span class="cat-count">1개 글</span>
+        </div>
+      </div>
+
+      <div class="category-card" data-cat="git">
+        <div class="cat-icon" style="background: linear-gradient(135deg,#f4511e,#f9784b);">Git</div>
+        <div class="cat-info">
+          <h2 class="cat-name">Git</h2>
+          <p class="cat-desc">Git 워크플로우, 브랜치 전략, 협업 등</p>
+          <span class="cat-count">1개 글</span>
+        </div>
+      </div>
+
+      <div class="category-card" data-cat="performance">
+        <div class="cat-icon" style="background: linear-gradient(135deg,#fa709a,#fee140);">Perf</div>
+        <div class="cat-info">
+          <h2 class="cat-name">Performance</h2>
+          <p class="cat-desc">Core Web Vitals, 폰트, 이미지 최적화 등</p>
+          <span class="cat-count">1개 글</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Posts section per category -->
+    <div class="cat-posts-section">
+      <h2 class="section-title">JavaScript</h2>
+      <div class="posts-list">
+        <a href="#" class="post-list-item">
+          <span class="post-list-title">웹 컴포넌트로 만드는 재사용 가능한 UI</span>
+          <span class="post-list-date">2026. 04. 07</span>
+        </a>
+        <a href="#" class="post-list-item">
+          <span class="post-list-title">LocalStorage vs SessionStorage 언제 무엇을 쓸까</span>
+          <span class="post-list-date">2026. 04. 03</span>
+        </a>
+        <a href="#" class="post-list-item">
+          <span class="post-list-title">다크모드 구현의 모든 것</span>
+          <span class="post-list-date">2026. 03. 20</span>
+        </a>
+      </div>
+
+      <h2 class="section-title" style="margin-top:3rem;">CSS</h2>
+      <div class="posts-list">
+        <a href="#" class="post-list-item">
+          <span class="post-list-title">OKLCH로 더 나은 색상 시스템 만들기</span>
+          <span class="post-list-date">2026. 04. 05</span>
+        </a>
+        <a href="#" class="post-list-item">
+          <span class="post-list-title">CSS @layer로 스타일 우선순위 정복하기</span>
+          <span class="post-list-date">2026. 03. 28</span>
+        </a>
+      </div>
+
+      <h2 class="section-title" style="margin-top:3rem;">Web / DevOps / Git / Performance</h2>
+      <div class="posts-list">
+        <a href="#" class="post-list-item">
+          <span class="post-list-title">Git Push로 자동 배포하기</span>
+          <span class="post-list-date">2026. 04. 01</span>
+        </a>
+        <a href="#" class="post-list-item">
+          <span class="post-list-title">폰트 로딩 최적화 완벽 가이드</span>
+          <span class="post-list-date">2026. 03. 25</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로그인 — Devlog</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body class="auth-page">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="auth-card">
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="loginTab">로그인</button>
+        <button class="auth-tab" id="signupTab">회원가입</button>
+      </div>
+
+      <!-- Login Form -->
+      <form class="auth-form" id="loginForm">
+        <h2 class="auth-title">다시 돌아오셨군요 👋</h2>
+        <p class="auth-sub">Devlog에 로그인하세요.</p>
+
+        <div class="form-group">
+          <label class="form-label">이메일</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="hello@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            비밀번호
+            <a href="#" class="form-label-link">비밀번호 찾기</a>
+          </label>
+          <div class="input-wrap">
+            <input type="password" class="form-input" id="loginPw" placeholder="비밀번호 입력" required>
+            <button type="button" class="pw-toggle" data-target="loginPw">👁</button>
+          </div>
+        </div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember">
+          <span>로그인 상태 유지</span>
+        </label>
+
+        <button type="submit" class="btn-primary btn-full">로그인</button>
+
+        <p class="auth-divider"><span>또는</span></p>
+
+        <button type="button" class="btn-social">
+          <span>🔑</span> Google로 계속하기
+        </button>
+        <button type="button" class="btn-social">
+          <span>🐙</span> GitHub로 계속하기
+        </button>
+      </form>
+
+      <!-- Signup Form -->
+      <form class="auth-form hidden" id="signupForm">
+        <h2 class="auth-title">함께해요 ✨</h2>
+        <p class="auth-sub">Devlog 계정을 만들어보세요.</p>
+
+        <div class="form-group">
+          <label class="form-label">닉네임</label>
+          <input type="text" class="form-input" id="signupName" placeholder="홍길동" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">이메일</label>
+          <input type="email" class="form-input" id="signupEmail" placeholder="hello@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">비밀번호</label>
+          <div class="input-wrap">
+            <input type="password" class="form-input" id="signupPw" placeholder="8자 이상 입력" required>
+            <button type="button" class="pw-toggle" data-target="signupPw">👁</button>
+          </div>
+          <div class="pw-strength" id="pwStrength"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">비밀번호 확인</label>
+          <div class="input-wrap">
+            <input type="password" class="form-input" id="signupPwConfirm" placeholder="비밀번호 재입력" required>
+            <button type="button" class="pw-toggle" data-target="signupPwConfirm">👁</button>
+          </div>
+        </div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="agree" required>
+          <span><a href="#" class="form-label-link">이용약관</a> 및 <a href="#" class="form-label-link">개인정보처리방침</a>에 동의합니다.</span>
+        </label>
+
+        <button type="submit" class="btn-primary btn-full">회원가입</button>
+      </form>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/main.js"></script>
+</body>
+</html>

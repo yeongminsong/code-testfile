@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OKLCH로 더 나은 색상 시스템 만들기 — Devlog</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">CSS</span>
+          <span class="tag">Design</span>
+        </div>
+        <h1 class="post-h1">OKLCH로 더 나은 색상 시스템 만들기</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 05</span>
+          <span>⏱ 6분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>우리가 오랫동안 사용해온 <code>HEX</code>, <code>RGB</code>, <code>HSL</code>은 모니터를 위한 색상 모델입니다. 하지만 사람의 눈이 색을 인식하는 방식과는 차이가 있어서 "지각적으로 균일하지 않다"는 문제가 있습니다. <strong>OKLCH</strong>는 이 문제를 해결하는 현대적인 CSS 색상 함수입니다.</p>
+
+        <h2>기존 색상 모델의 문제점</h2>
+        <p>HSL은 <em>색상(Hue), 채도(Saturation), 명도(Lightness)</em>로 색을 표현합니다. 얼핏 직관적으로 보이지만, 실제로 동일한 <code>L</code> 값이라도 색조에 따라 밝기가 다르게 느껴집니다.</p>
+
+        <blockquote>예를 들어 노란색 <code>hsl(60, 100%, 50%)</code>과 파란색 <code>hsl(240, 100%, 50%)</code>는 L값이 같아도 노란색이 훨씬 밝게 보입니다.</blockquote>
+
+        <p>이런 불균일함은 버튼 hover 상태, 다크모드 색상 팔레트 설계 시 예측 불가능한 결과를 낳습니다.</p>
+
+        <h2>OKLCH란?</h2>
+        <p>OKLCH는 <strong>L</strong>(밝기, Lightness), <strong>C</strong>(채도, Chroma), <strong>H</strong>(색조, Hue) 세 가지 축으로 색을 표현합니다. OKLab 색상 공간을 기반으로 하며, 사람의 시각적 인식과 수학적 값의 변화가 일치하도록 설계되었습니다.</p>
+
+        <pre><code class="language-css">/* oklch(밝기 채도 색조) */
+.button {
+  background-color: oklch(65% 0.25 290); /* 보라색 계열 */
+  color: oklch(99% 0 0);                 /* 거의 흰색 */
+}</code></pre>
+
+        <table>
+          <thead>
+            <tr><th>항목</th><th>HSL</th><th>OKLCH</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>지각 균일성</td><td>❌ 낮음</td><td>✅ 높음</td></tr>
+            <tr><td>밝기 예측성</td><td>❌ 색조마다 다름</td><td>✅ 항상 일관</td></tr>
+            <tr><td>다크모드 설계</td><td>😓 어려움</td><td>😊 쉬움</td></tr>
+            <tr><td>브라우저 지원</td><td>✅ 전부</td><td>✅ 모던 브라우저</td></tr>
+          </tbody>
+        </table>
+
+        <h2>다크모드 색상 시스템에 적용하기</h2>
+        <p>OKLCH의 진가는 CSS 변수와 함께 쓸 때 드러납니다. <code>L</code> 값만 조정하면 자동으로 밝기가 일관되게 바뀝니다.</p>
+
+        <pre><code class="language-css">:root {
+  --primary:    oklch(65% 0.25 290);
+  --bg:         oklch(98% 0.01 240);
+  --text:       oklch(25% 0.05 240);
+  --surface:    oklch(99% 0.005 240);
+}
+
+[data-theme="dark"] {
+  /* L 값만 뒤집으면 됩니다 */
+  --primary:    oklch(70% 0.25 290);  /* 조금 더 밝게 */
+  --bg:         oklch(15% 0.01 240);
+  --text:       oklch(88% 0.03 240);
+  --surface:    oklch(22% 0.01 240);
+}</code></pre>
+
+        <p>HSL로 같은 작업을 하면 각 색조별로 다른 L 값을 실험해가며 맞춰야 하지만, OKLCH는 수학적으로 균일하기 때문에 공식처럼 적용할 수 있습니다.</p>
+
+        <h2>채도(Chroma) 다루기</h2>
+        <p>OKLCH의 <code>C</code>(Chroma)는 색의 선명함을 나타냅니다. 0에 가까울수록 무채색, 높을수록 선명합니다. 단, 채도의 최대값은 색조마다 다릅니다 — 이 점이 HSL의 <code>S</code>와 다릅니다.</p>
+
+        <pre><code class="language-css">/* 같은 보라색 계열에서 채도 변화 */
+.muted   { color: oklch(65% 0.05 290); } /* 흐린 보라 */
+.normal  { color: oklch(65% 0.15 290); } /* 보통 보라 */
+.vivid   { color: oklch(65% 0.30 290); } /* 선명한 보라 */</code></pre>
+
+        <h2>실전 팁: 색상 팔레트 한 줄로 만들기</h2>
+        <p>OKLCH와 CSS <code>calc()</code>를 조합하면 반복 없는 팔레트를 만들 수 있습니다.</p>
+
+        <pre><code class="language-css">:root {
+  --hue: 290;  /* 이것만 바꾸면 전체 팔레트 색조 변경 */
+
+  --color-100: oklch(95% 0.05 var(--hue));
+  --color-300: oklch(80% 0.15 var(--hue));
+  --color-500: oklch(65% 0.25 var(--hue));
+  --color-700: oklch(45% 0.20 var(--hue));
+  --color-900: oklch(25% 0.10 var(--hue));
+}</code></pre>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          OKLCH는 사람의 시각과 일치하는 지각 균일 색상 모델입니다. CSS 변수와 함께 사용하면 다크모드 설계, 팔레트 시스템 구축이 훨씬 예측 가능하고 쉬워집니다. 모던 브라우저는 모두 지원합니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

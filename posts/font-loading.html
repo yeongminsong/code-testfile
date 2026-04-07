@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>폰트 로딩 최적화 완벽 가이드 — Devlog</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">Web</span>
+          <span class="tag">Performance</span>
+        </div>
+        <h1 class="post-h1">폰트 로딩 최적화 완벽 가이드</h1>
+        <div class="post-meta">
+          <span>📅 2026. 03. 25</span>
+          <span>⏱ 7분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>웹폰트는 디자인의 완성도를 높이지만, 잘못 사용하면 페이지 로딩 속도와 사용자 경험에 큰 영향을 줍니다. 이 글에서는 폰트 로딩의 원리와 최적화 방법을 단계별로 정리합니다.</p>
+
+        <h2>FOUT와 FOIT 이해하기</h2>
+        <p>브라우저가 웹폰트를 불러오는 동안 텍스트를 어떻게 처리하느냐에 따라 두 가지 현상이 발생합니다.</p>
+
+        <table>
+          <thead>
+            <tr><th>현상</th><th>설명</th><th>문제점</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>FOUT</strong><br><small>Flash Of Unstyled Text</small></td>
+              <td>기본 폰트로 텍스트를 먼저 보여준 뒤 웹폰트로 교체</td>
+              <td>텍스트가 갑자기 바뀌며 레이아웃 이동 발생</td>
+            </tr>
+            <tr>
+              <td><strong>FOIT</strong><br><small>Flash Of Invisible Text</small></td>
+              <td>웹폰트 로드 전까지 텍스트 숨김</td>
+              <td>텍스트가 늦게 나타나 콘텐츠 인식 지연</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>font-display 속성으로 제어하기</h2>
+        <p><code>@font-face</code>의 <code>font-display</code> 속성으로 로딩 동작을 제어할 수 있습니다.</p>
+
+        <pre><code class="language-css">@font-face {
+  font-family: 'MyFont';
+  src: url('/fonts/MyFont.woff2') format('woff2');
+  font-display: swap; /* 권장값 */
+}</code></pre>
+
+        <table>
+          <thead>
+            <tr><th>값</th><th>동작</th><th>추천 상황</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>auto</code></td><td>브라우저 기본값</td><td>—</td></tr>
+            <tr><td><code>block</code></td><td>폰트 로드까지 텍스트 숨김 (FOIT)</td><td>아이콘 폰트</td></tr>
+            <tr><td><code>swap</code></td><td>기본 폰트 먼저 표시 후 교체 (FOUT)</td><td>본문 텍스트 ✅</td></tr>
+            <tr><td><code>fallback</code></td><td>100ms 숨김 후 교체, 3초 후 기본 폰트 확정</td><td>중요한 텍스트</td></tr>
+            <tr><td><code>optional</code></td><td>빠르게 로드되면 사용, 아니면 기본 폰트 유지</td><td>장식 폰트</td></tr>
+          </tbody>
+        </table>
+
+        <h2>preconnect로 연결 미리 시작하기</h2>
+        <p>Google Fonts 같은 외부 CDN을 사용한다면 <code>&lt;link rel="preconnect"&gt;</code>로 DNS 조회와 TCP 연결을 미리 시작할 수 있습니다.</p>
+
+        <pre><code class="language-html">&lt;!-- DNS + TCP + TLS 핸드셰이크를 미리 시작 --&gt;
+&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+
+&lt;!-- 그 다음 폰트 CSS 로드 --&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&amp;display=swap" rel="stylesheet"&gt;</code></pre>
+
+        <blockquote><code>crossorigin</code> 속성이 없으면 폰트 파일 자체의 연결(fonts.gstatic.com)에서 preconnect가 제대로 동작하지 않습니다. 반드시 추가하세요.</blockquote>
+
+        <h2>폰트 파일 자체를 preload하기</h2>
+        <p>가장 중요한 폰트 파일을 직접 preload하면 더 빠릅니다.</p>
+
+        <pre><code class="language-html">&lt;link
+  rel="preload"
+  href="/fonts/Pretendard-Regular.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+&gt;</code></pre>
+
+        <h2>서브셋(Subset) 폰트 사용하기</h2>
+        <p>한국어 폰트는 수천 개의 글리프를 포함하여 파일 크기가 큽니다. 실제 사용하는 글자만 추출한 서브셋을 사용하면 크기를 90% 이상 줄일 수 있습니다.</p>
+
+        <pre><code class="language-bash"># pyftsubset으로 서브셋 생성 (fonttools 필요)
+pip install fonttools
+
+pyftsubset NotoSansKR-Regular.ttf \
+  --unicodes="U+AC00-D7A3,U+0030-0039,U+0041-005A,U+0061-007A" \
+  --layout-features="*" \
+  --flavor=woff2 \
+  --output-file="NotoSansKR-subset.woff2"</code></pre>
+
+        <h2>Variable Font 활용하기</h2>
+        <p>여러 굵기(weight)의 폰트를 각각 불러오는 대신, <strong>Variable Font</strong> 하나로 모든 굵기를 사용할 수 있습니다.</p>
+
+        <pre><code class="language-css">@font-face {
+  font-family: 'Pretendard Variable';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+  font-weight: 100 900; /* 전체 weight 범위 지원 */
+  font-display: swap;
+}
+
+/* 이제 어떤 weight도 자유롭게 */
+h1 { font-weight: 800; }
+p  { font-weight: 400; }
+small { font-weight: 300; }</code></pre>
+
+        <div class="callout">
+          <strong>폰트 최적화 체크리스트</strong><br>
+          ✅ <code>font-display: swap</code> 사용<br>
+          ✅ 외부 CDN에 <code>preconnect</code> 추가<br>
+          ✅ 중요 폰트 파일 <code>preload</code><br>
+          ✅ <code>woff2</code> 형식만 사용 (최신 브라우저 100% 지원)<br>
+          ✅ 서브셋 또는 Variable Font 적용
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

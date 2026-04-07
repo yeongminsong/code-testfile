@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSS @layer로 스타일 우선순위 정복하기 — Devlog</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">CSS</span>
+        </div>
+        <h1 class="post-h1">CSS @layer로 스타일 우선순위 정복하기</h1>
+        <div class="post-meta">
+          <span>📅 2026. 03. 28</span>
+          <span>⏱ 6분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>CSS를 오래 작성하다 보면 반드시 마주치는 문제가 있습니다. 바로 스타일 <strong>우선순위 충돌</strong>입니다. 외부 라이브러리의 스타일이 내 스타일을 덮어쓰거나, 컴포넌트 스타일이 글로벌 스타일과 충돌하는 상황 말이죠. 이를 해결하기 위해 <code>!important</code>를 남발하다 보면 코드는 금방 엉망이 됩니다.</p>
+
+        <p>CSS <strong>@layer</strong>는 이 문제를 우아하게 해결하는 현대적인 방법입니다.</p>
+
+        <h2>CSS 캐스케이드 복습</h2>
+        <p>브라우저가 어떤 스타일을 적용할지 결정하는 순서는 다음과 같습니다.</p>
+        <ol>
+          <li>출처 (브라우저 기본값 &lt; 작성자 스타일 &lt; 사용자 스타일)</li>
+          <li><strong>레이어 순서</strong> ← @layer가 여기에 개입</li>
+          <li>명시도 (specificity)</li>
+          <li>작성 순서</li>
+        </ol>
+
+        <h2>@layer 기본 사용법</h2>
+        <p>레이어를 선언하고 각 레이어에 스타일을 배치합니다. <strong>나중에 선언된 레이어가 더 높은 우선순위</strong>를 갖습니다.</p>
+
+        <pre><code class="language-css">/* 레이어 순서 먼저 선언 (선택 사항이지만 권장) */
+@layer reset, base, components, utilities;
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+}
+
+@layer base {
+  body { font-family: sans-serif; color: #333; }
+  a { color: blue; }
+}
+
+@layer components {
+  .card { border: 1px solid #e5e7eb; border-radius: 0.75rem; }
+  .btn  { padding: 0.5rem 1rem; border-radius: 0.4rem; }
+}
+
+@layer utilities {
+  .text-center { text-align: center; }
+  .mt-4 { margin-top: 1rem; }
+}</code></pre>
+
+        <p>이 예시에서 우선순위는 <code>utilities &gt; components &gt; base &gt; reset</code> 순입니다.</p>
+
+        <h2>외부 라이브러리 다루기</h2>
+        <p>@layer의 진짜 강점은 외부 CSS를 레이어에 넣는 것입니다. 레이어 안의 스타일은 레이어 밖의 스타일보다 항상 낮은 우선순위를 갖습니다.</p>
+
+        <pre><code class="language-css">/* Bootstrap을 레이어에 가두기 */
+@import url('bootstrap.css') layer(bootstrap);
+
+/* 이제 내 스타일이 항상 Bootstrap을 이깁니다 */
+.btn {
+  background-color: #6891f8; /* !important 없이도 적용됨 */
+}</code></pre>
+
+        <blockquote>레이어 밖의 스타일은 모든 레이어보다 높은 우선순위를 가집니다. 즉, 레이어에 넣지 않은 내 커스텀 스타일은 항상 이깁니다.</blockquote>
+
+        <h2>중첩 레이어</h2>
+        <p>레이어 안에 레이어를 만들 수도 있습니다. 디자인 시스템 구조화에 유용합니다.</p>
+
+        <pre><code class="language-css">@layer components {
+  @layer base {
+    .btn { padding: 0.5rem 1rem; }
+  }
+
+  @layer variants {
+    .btn-primary { background-color: #6891f8; color: white; }
+    .btn-danger  { background-color: #ef4444; color: white; }
+  }
+  /* variants > base */
+}</code></pre>
+
+        <h2>실전: Tailwind + 커스텀 CSS</h2>
+        <p>Tailwind CSS와 함께 사용하면 유틸리티 클래스가 컴포넌트 스타일을 덮어쓰는 문제를 깔끔하게 해결할 수 있습니다.</p>
+
+        <pre><code class="language-css">/* Tailwind를 레이어에 가두기 */
+@import "tailwindcss" layer(tailwind);
+
+/* 내 컴포넌트 스타일 (레이어 밖 → 항상 이김) */
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}</code></pre>
+
+        <h2>브라우저 지원</h2>
+        <p>Chrome 99+, Firefox 97+, Safari 15.4+ 이상에서 지원합니다. 2022년부터 모든 모던 브라우저가 지원하므로 실무에서 사용해도 안전합니다.</p>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          @layer는 CSS 우선순위를 명시적으로 관리하는 도구입니다. 레이어 순서를 선언부에서 한 번에 제어하고, 외부 라이브러리는 레이어 안에 가두세요. <code>!important</code>와의 이별을 선언할 시간입니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

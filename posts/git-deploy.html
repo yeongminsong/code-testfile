@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Git Push로 자동 배포하기 — Devlog</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">Git</span>
+          <span class="tag">DevOps</span>
+        </div>
+        <h1 class="post-h1">Git Push로 자동 배포하기</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 01</span>
+          <span>⏱ 7분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>GitHub Actions, CI/CD 파이프라인 없이도 <code>git push</code> 한 번만으로 서버에 자동 배포되는 환경을 구성할 수 있습니다. Git의 <strong>server-side hook</strong> 중 하나인 <code>post-receive</code>를 이용하면 됩니다.</p>
+
+        <h2>Git Hooks란?</h2>
+        <p>Git은 특정 이벤트가 발생할 때 자동으로 실행되는 스크립트인 <strong>Hooks</strong>를 지원합니다. 클라이언트 훅(<code>pre-commit</code>, <code>pre-push</code> 등)과 서버 훅(<code>pre-receive</code>, <code>post-receive</code> 등)으로 나뉩니다.</p>
+
+        <ul>
+          <li><code>pre-receive</code> — push 직전에 실행 (거부 가능)</li>
+          <li><code>post-receive</code> — push 완료 후 실행 ← <strong>배포에 사용</strong></li>
+        </ul>
+
+        <h2>설정 방법</h2>
+        <h3>1단계 — 서버에 bare 저장소 만들기</h3>
+        <p>서버에 SSH로 접속 후, bare 저장소를 생성합니다. Bare 저장소는 작업 디렉토리 없이 Git 데이터만 가진 저장소입니다.</p>
+
+        <pre><code class="language-bash"># 서버에서 실행
+mkdir -p ~/repos/myproject.git
+cd ~/repos/myproject.git
+git init --bare</code></pre>
+
+        <h3>2단계 — post-receive 훅 작성</h3>
+        <pre><code class="language-bash">vi ~/repos/myproject.git/hooks/post-receive</code></pre>
+
+        <pre><code class="language-bash">#!/bin/bash
+
+# 배포 디렉토리
+TARGET="/var/www/myproject"
+# bare 저장소 경로
+GIT_DIR="/home/deploy/repos/myproject.git"
+BRANCH="main"
+
+while read oldrev newrev refname; do
+  # main 브랜치에 push 됐을 때만 배포
+  if [ "$refname" = "refs/heads/$BRANCH" ]; then
+    echo "🚀 배포 시작..."
+    git --work-tree="$TARGET" --git-dir="$GIT_DIR" checkout -f "$BRANCH"
+    echo "✅ 배포 완료!"
+  fi
+done</code></pre>
+
+        <pre><code class="language-bash"># 실행 권한 부여 (필수!)
+chmod +x ~/repos/myproject.git/hooks/post-receive</code></pre>
+
+        <h3>3단계 — 로컬에서 remote 추가</h3>
+        <pre><code class="language-bash"># 로컬 프로젝트에서 실행
+git remote add production deploy@your-server.com:repos/myproject.git
+
+# 이제 push 한 번으로 배포
+git push production main</code></pre>
+
+        <h2>Node.js 프로젝트에 적용하기</h2>
+        <p>Node.js 프로젝트라면 배포 후 패키지 설치와 프로세스 재시작도 훅에서 처리할 수 있습니다.</p>
+
+        <pre><code class="language-bash">#!/bin/bash
+TARGET="/var/www/myapp"
+GIT_DIR="/home/deploy/repos/myapp.git"
+
+while read oldrev newrev refname; do
+  if [ "$refname" = "refs/heads/main" ]; then
+    echo "📦 코드 동기화..."
+    git --work-tree="$TARGET" --git-dir="$GIT_DIR" checkout -f main
+
+    echo "📦 패키지 설치..."
+    cd "$TARGET"
+    npm install --production
+
+    echo "🔄 서버 재시작..."
+    pm2 restart myapp
+
+    echo "✅ 배포 완료! $(date)"
+  fi
+done</code></pre>
+
+        <h2>GitHub Pages 방식 (무료)</h2>
+        <p>개인 정적 사이트라면 GitHub Pages를 활용하면 서버 없이도 push만으로 배포됩니다.</p>
+
+        <pre><code class="language-bash"># gh-pages 브랜치에 push하면 자동 배포
+git subtree push --prefix dist origin gh-pages
+
+# 또는 npm 패키지 활용
+npm install -g gh-pages
+gh-pages -d dist</code></pre>
+
+        <div class="callout">
+          <strong>보안 주의사항</strong><br>
+          서버 훅 방식을 사용할 때는 배포 전용 사용자(<code>deploy</code>)를 따로 만들고, SSH 공개 키 인증만 허용하세요. 비밀번호 인증은 반드시 비활성화하세요.
+        </div>
+
+        <h2>마치며</h2>
+        <p>GitHub Actions가 강력하지만, 소규모 프로젝트나 개인 서버 환경에서는 git hooks만으로도 충분한 자동화가 가능합니다. 한번 설정해두면 이후 <code>git push production main</code> 한 줄로 배포가 끝납니다.</p>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

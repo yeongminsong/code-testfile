@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JavaScript 성능 최적화 실전 가이드 — Devlog</title>
+  <meta name="description" content="메모이제이션, 가상화, 번들 최적화, 웹 워커까지 — 느린 JavaScript 앱을 빠르게 만드는 핵심 기법을 실전 예제로 정리합니다.">
+  <link rel="canonical" href="https://info-batches.pages.dev/posts/js-performance.html">
+  <meta property="og:title" content="JavaScript 성능 최적화 실전 가이드 — Devlog">
+  <meta property="og:description" content="메모이제이션, 가상화, 번들 최적화, 웹 워커까지 — 느린 JavaScript 앱을 빠르게 만드는 핵심 기법을 실전 예제로 정리합니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://info-batches.pages.dev/posts/js-performance.html">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript 성능 최적화 실전 가이드 — Devlog">
+  <meta name="twitter:description" content="메모이제이션, 가상화, 번들 최적화, 웹 워커까지 느린 JS 앱을 빠르게 만드는 기법을 정리합니다.">
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop">
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "JavaScript 성능 최적화 실전 가이드",
+    "description": "메모이제이션, 가상화, 번들 최적화, 웹 워커까지 — 느린 JavaScript 앱을 빠르게 만드는 핵심 기법을 실전 예제로 정리합니다.",
+    "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop",
+    "url": "https://info-batches.pages.dev/posts/js-performance.html",
+    "datePublished": "2026-04-09",
+    "dateModified": "2026-04-09",
+    "author": {"@type": "Organization", "name": "Devlog"},
+    "publisher": {"@type": "Organization", "name": "Devlog", "url": "https://info-batches.pages.dev"}
+  }</script>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">JavaScript</span>
+          <span class="tag">Performance</span>
+          <span class="tag">Web</span>
+        </div>
+        <h1 class="post-h1">JavaScript 성능 최적화 실전 가이드</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 09</span>
+          <span>⏱ 13분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>"작동은 하는데 느리다." 개발자라면 누구나 한 번쯤 들어봤을 불평입니다. 기능 개발이 끝난 뒤 성능 문제가 수면 위로 드러나는 경우가 많죠. 이 글에서는 JavaScript 앱이 느려지는 진짜 원인을 파악하고, 측정 → 개선 → 검증 흐름으로 성능을 올리는 실전 기법을 정리합니다.</p>
+
+        <h2>먼저 측정하라 — 추측하지 말고</h2>
+        <p>무작정 코드를 최적화하기 전에 반드시 병목을 먼저 찾아야 합니다. Chrome DevTools의 Performance 탭과 <code>console.time</code>이 출발점입니다.</p>
+
+        <pre><code class="language-javascript">// 간단한 함수 실행 시간 측정
+console.time('processData');
+const result = processLargeArray(data);
+console.timeEnd('processData'); // processData: 342ms
+
+// Performance API — 고해상도 타이밍
+const start = performance.now();
+heavyOperation();
+const duration = performance.now() - start;
+console.log(`실행 시간: ${duration.toFixed(2)}ms`);
+
+// 마커로 구간 표시 (DevTools Performance 탭에서 확인)
+performance.mark('render-start');
+renderDashboard();
+performance.mark('render-end');
+performance.measure('render', 'render-start', 'render-end');</code></pre>
+
+        <h2>메모이제이션 — 같은 계산 반복하지 않기</h2>
+        <p>같은 입력에 항상 같은 결과를 돌려주는 순수 함수라면 결과를 캐싱해 중복 계산을 피할 수 있습니다.</p>
+
+        <pre><code class="language-javascript">// 직접 구현하는 메모이제이션
+function memoize(fn) {
+  const cache = new Map();
+  return function(...args) {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key);
+    const result = fn.apply(this, args);
+    cache.set(key, result);
+    return result;
+  };
+}
+
+// 재귀 피보나치 — 메모이제이션 전: O(2^n), 후: O(n)
+const fib = memoize(function(n) {
+  if (n <= 1) return n;
+  return fib(n - 1) + fib(n - 2);
+});
+
+console.log(fib(40)); // 메모이제이션 없으면 수 초, 있으면 즉시</code></pre>
+
+        <h2>배열 & 루프 최적화</h2>
+        <p>대용량 데이터 처리에서 잘못된 루프 패턴은 큰 성능 차이를 만들어냅니다.</p>
+
+        <pre><code class="language-javascript">const bigArray = Array.from({ length: 1_000_000 }, (_, i) => i);
+
+// ❌ 느림 — 매 반복마다 length를 참조하고 push는 재할당 발생
+const result1 = [];
+for (let i = 0; i < bigArray.length; i++) {
+  if (bigArray[i] % 2 === 0) result1.push(bigArray[i] * 2);
+}
+
+// ✅ 빠름 — length 캐싱, 사전 할당
+const len = bigArray.length;
+const result2 = new Array(len); // 최대 크기 사전 할당
+let count = 0;
+for (let i = 0; i < len; i++) {
+  if (bigArray[i] % 2 === 0) result2[count++] = bigArray[i] * 2;
+}
+result2.length = count;
+
+// 체이닝 지양 — filter().map() 은 배열을 두 번 순회
+// 하나의 reduce나 for 루프로 처리
+const result3 = bigArray.reduce((acc, n) => {
+  if (n % 2 === 0) acc.push(n * 2);
+  return acc;
+}, []);</code></pre>
+
+        <h2>DOM 조작 최소화 — Reflow 줄이기</h2>
+        <p>DOM 접근과 스타일 변경은 브라우저의 <strong>Reflow(레이아웃 재계산)</strong>를 유발합니다. 특히 읽기와 쓰기를 번갈아 하면 강제 동기 레이아웃이 발생해 극도로 느려집니다.</p>
+
+        <pre><code class="language-javascript">// ❌ 강제 동기 레이아웃 (Forced Synchronous Layout)
+const boxes = document.querySelectorAll('.box');
+boxes.forEach(box => {
+  const width = box.offsetWidth; // 읽기 → 레이아웃 강제 실행
+  box.style.width = width * 2 + 'px'; // 쓰기 → dirty
+  // 다음 반복에서 다시 읽기 → 또 레이아웃 강제 실행 (n번 반복!)
+});
+
+// ✅ 읽기 먼저 일괄, 쓰기 나중 일괄
+const widths = Array.from(boxes).map(box => box.offsetWidth); // 읽기 일괄
+boxes.forEach((box, i) => {
+  box.style.width = widths[i] * 2 + 'px'; // 쓰기 일괄
+});
+
+// ✅ DocumentFragment — DOM 삽입 횟수 최소화
+const fragment = document.createDocumentFragment();
+items.forEach(item => {
+  const li = document.createElement('li');
+  li.textContent = item.name;
+  fragment.appendChild(li);
+});
+list.appendChild(fragment); // 단 한 번의 DOM 삽입</code></pre>
+
+        <h2>이벤트 위임 — 리스너 수 줄이기</h2>
+        <p>수천 개의 아이템에 각각 이벤트 리스너를 붙이는 것은 메모리 낭비입니다. 공통 부모 하나에만 리스너를 달고 <code>event.target</code>으로 대상을 구별하세요.</p>
+
+        <pre><code class="language-javascript">// ❌ 아이템마다 리스너 — 메모리 낭비
+document.querySelectorAll('.item').forEach(item => {
+  item.addEventListener('click', handleClick);
+});
+
+// ✅ 이벤트 위임 — 리스너 단 1개
+document.querySelector('.item-list').addEventListener('click', (e) => {
+  const item = e.target.closest('.item');
+  if (!item) return;
+  handleClick(item);
+});</code></pre>
+
+        <h2>웹 워커 — 메인 스레드 블로킹 해소</h2>
+        <p>JavaScript는 싱글 스레드입니다. 무거운 연산을 메인 스레드에서 실행하면 UI가 멈춥니다. <strong>Web Worker</strong>로 별도 스레드에서 처리하면 UI를 부드럽게 유지할 수 있습니다.</p>
+
+        <pre><code class="language-javascript">// worker.js
+self.onmessage = function(e) {
+  const { data, operation } = e.data;
+
+  let result;
+  if (operation === 'sort') {
+    result = [...data].sort((a, b) => a - b);
+  } else if (operation === 'filter') {
+    result = data.filter(n => n % 2 === 0);
+  }
+
+  self.postMessage(result);
+};
+
+// main.js
+const worker = new Worker('./worker.js');
+
+worker.postMessage({ data: hugeArray, operation: 'sort' });
+
+worker.onmessage = (e) => {
+  console.log('정렬 완료:', e.data);
+  renderResults(e.data);
+};</code></pre>
+
+        <h2>번들 최적화 — 코드 스플리팅과 트리 쉐이킹</h2>
+        <p>초기 번들 크기는 Time To Interactive에 직결됩니다. 모든 코드를 하나의 파일로 보내지 말고 필요할 때 불러오세요.</p>
+
+        <pre><code class="language-javascript">// 동적 import — 지연 로딩
+const handleExport = async () => {
+  // 버튼 클릭 시에만 무거운 라이브러리 로드
+  const { exportToPDF } = await import('./lib/pdf-exporter.js');
+  exportToPDF(document.body);
+};
+
+// React에서의 코드 스플리팅
+import { lazy, Suspense } from 'react';
+const HeavyChart = lazy(() => import('./HeavyChart'));
+
+function Dashboard() {
+  return (
+    &lt;Suspense fallback={&lt;div&gt;로딩 중...&lt;/div&gt;}&gt;
+      &lt;HeavyChart /&gt;
+    &lt;/Suspense&gt;
+  );
+}</code></pre>
+
+        <h2>requestAnimationFrame — 애니메이션 최적화</h2>
+        <p>애니메이션을 <code>setTimeout</code>으로 구현하면 프레임 타이밍이 맞지 않아 끊깁니다. <code>requestAnimationFrame</code>은 브라우저의 페인트 주기에 맞춰 실행됩니다.</p>
+
+        <pre><code class="language-javascript">// ❌ setTimeout — 프레임 타이밍 불일치
+let pos = 0;
+setInterval(() => {
+  element.style.transform = `translateX(${pos++}px)`;
+}, 16);
+
+// ✅ requestAnimationFrame — 브라우저 최적화 활용
+let pos = 0;
+let rafId;
+
+function animate() {
+  pos += 2;
+  element.style.transform = `translateX(${pos}px)`;
+  if (pos < 500) {
+    rafId = requestAnimationFrame(animate);
+  }
+}
+
+rafId = requestAnimationFrame(animate);
+
+// 정지
+cancelAnimationFrame(rafId);</code></pre>
+
+        <div class="callout">
+          <strong>성능 최적화의 황금 법칙</strong><br>
+          <strong>측정 → 원인 파악 → 개선 → 재측정</strong>. 직관에 의존해 무작정 최적화하면 오히려 코드가 복잡해지고 유지보수만 어려워집니다. Chrome DevTools의 Performance 탭, Lighthouse, WebPageTest를 적극 활용하세요.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

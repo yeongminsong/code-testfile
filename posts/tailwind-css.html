@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tailwind CSS로 빠른 UI 개발하기 — Devlog</title>
+  <meta name="description" content="Tailwind CSS의 유틸리티 우선 방식부터 반응형 디자인, 다크모드, 컴포넌트 추상화까지 — Tailwind를 빠르게 익히고 실전에서 쓰는 완전 가이드입니다.">
+  <link rel="canonical" href="https://info-batches.pages.dev/posts/tailwind-css.html">
+  <meta property="og:title" content="Tailwind CSS로 빠른 UI 개발하기 — Devlog">
+  <meta property="og:description" content="Tailwind CSS의 유틸리티 우선 방식부터 반응형 디자인, 다크모드, 컴포넌트 추상화까지 — 실전에서 쓰는 완전 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://info-batches.pages.dev/posts/tailwind-css.html">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1587440871875-191322ee64b0?w=1200&h=630&fit=crop">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tailwind CSS로 빠른 UI 개발하기 — Devlog">
+  <meta name="twitter:description" content="Tailwind CSS의 유틸리티 우선 방식부터 반응형, 다크모드까지 실전 가이드입니다.">
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1587440871875-191322ee64b0?w=1200&h=630&fit=crop">
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Tailwind CSS로 빠른 UI 개발하기",
+    "description": "Tailwind CSS의 유틸리티 우선 방식부터 반응형 디자인, 다크모드, 컴포넌트 추상화까지 — Tailwind를 빠르게 익히고 실전에서 쓰는 완전 가이드입니다.",
+    "image": "https://images.unsplash.com/photo-1587440871875-191322ee64b0?w=1200&h=630&fit=crop",
+    "url": "https://info-batches.pages.dev/posts/tailwind-css.html",
+    "datePublished": "2026-04-09",
+    "dateModified": "2026-04-09",
+    "author": {"@type": "Organization", "name": "Devlog"},
+    "publisher": {"@type": "Organization", "name": "Devlog", "url": "https://info-batches.pages.dev"}
+  }</script>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1587440871875-191322ee64b0?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">CSS</span>
+          <span class="tag">Design</span>
+          <span class="tag">Tools</span>
+        </div>
+        <h1 class="post-h1">Tailwind CSS로 빠른 UI 개발하기</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 09</span>
+          <span>⏱ 11분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>CSS를 작성하는 방식에는 여러 철학이 있지만, 최근 몇 년간 <strong>Tailwind CSS</strong>는 가장 빠르게 성장한 방식 중 하나로 자리잡았습니다. "HTML에 클래스를 너무 많이 쓰는 거 아닌가?"라는 초기 거부감을 넘어서면, 놀라운 개발 속도와 일관된 디자인 시스템을 경험할 수 있습니다. 이 글에서는 Tailwind의 핵심 개념부터 실전 패턴까지 단계별로 살펴봅니다.</p>
+
+        <h2>유틸리티 우선이란 무엇인가</h2>
+        <p>전통적인 CSS 방식은 컴포넌트별 클래스를 만들고 스타일을 별도 파일에 정의합니다. Tailwind는 반대로, 각각의 CSS 속성을 담당하는 작은 클래스들을 <em>조합</em>해서 스타일을 만듭니다.</p>
+
+        <pre><code class="language-html">&lt;!-- 전통적 BEM 방식 --&gt;
+&lt;button class="btn btn--primary btn--lg"&gt;저장&lt;/button&gt;
+
+&lt;!-- Tailwind 유틸리티 방식 --&gt;
+&lt;button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold
+               px-6 py-3 rounded-lg transition-colors cursor-pointer"&gt;
+  저장
+&lt;/button&gt;</code></pre>
+
+        <p>처음엔 클래스가 많아 보이지만, CSS 파일을 따로 열어볼 필요 없이 HTML만 보면 스타일을 즉시 파악할 수 있습니다. 또한 사용된 클래스만 최종 CSS에 포함되므로 프로덕션 번들은 수 KB에 불과합니다.</p>
+
+        <h2>설치 및 기본 설정</h2>
+        <pre><code class="language-bash"># npm
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+# tailwind.config.js
+module.exports = {
+  content: ['./src/**/*.{html,js,jsx,ts,tsx}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};</code></pre>
+
+        <pre><code class="language-css">/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;</code></pre>
+
+        <h2>핵심 유틸리티 클래스</h2>
+        <p>Tailwind의 클래스명은 CSS 속성을 직관적으로 표현합니다. 자주 쓰는 패턴을 익히면 나머지는 공식 문서를 검색해서 바로 쓸 수 있습니다.</p>
+
+        <pre><code class="language-html">&lt;!-- 레이아웃 (Flexbox) --&gt;
+&lt;div class="flex items-center justify-between gap-4"&gt;
+  &lt;span&gt;왼쪽&lt;/span&gt;
+  &lt;span&gt;오른쪽&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- 레이아웃 (Grid) --&gt;
+&lt;div class="grid grid-cols-3 gap-6"&gt;
+  &lt;div class="col-span-2"&gt;메인 콘텐츠&lt;/div&gt;
+  &lt;div&gt;사이드바&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 타이포그래피 --&gt;
+&lt;h1 class="text-3xl font-bold tracking-tight text-gray-900"&gt;제목&lt;/h1&gt;
+&lt;p class="text-base text-gray-600 leading-relaxed"&gt;본문&lt;/p&gt;
+
+&lt;!-- 간격 (Spacing: m=margin, p=padding, t/r/b/l/x/y) --&gt;
+&lt;div class="mt-8 px-4 py-6 mb-2"&gt;...&lt;/div&gt;
+
+&lt;!-- 테두리와 그림자 --&gt;
+&lt;div class="border border-gray-200 rounded-xl shadow-md p-6"&gt;카드&lt;/div&gt;</code></pre>
+
+        <h2>반응형 디자인 — 모바일 우선</h2>
+        <p>Tailwind의 반응형은 클래스 앞에 브레이크포인트 접두사를 붙이는 방식입니다. 접두사 없는 클래스는 모든 크기에 적용되고, 접두사가 있으면 해당 크기 이상에서 적용됩니다.</p>
+
+        <pre><code class="language-html">&lt;!-- 기본(모바일): 1열 / md(768px~): 2열 / lg(1024px~): 3열 --&gt;
+&lt;div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"&gt;
+  ...
+&lt;/div&gt;
+
+&lt;!-- 텍스트 크기도 반응형으로 --&gt;
+&lt;h1 class="text-2xl md:text-4xl lg:text-5xl font-bold"&gt;
+  반응형 제목
+&lt;/h1&gt;
+
+&lt;!-- 모바일에서만 숨기기 --&gt;
+&lt;nav class="hidden md:block"&gt;데스크톱 네비게이션&lt;/nav&gt;
+&lt;button class="md:hidden"&gt;모바일 햄버거 버튼&lt;/button&gt;</code></pre>
+
+        <h2>다크모드</h2>
+        <p><code>tailwind.config.js</code>에서 <code>darkMode: 'class'</code>를 설정하면 <code>dark:</code> 접두사로 다크모드 스타일을 지정할 수 있습니다.</p>
+
+        <pre><code class="language-js">// tailwind.config.js
+module.exports = {
+  darkMode: 'class', // 'media'로 바꾸면 OS 설정 따라감
+  // ...
+};</code></pre>
+
+        <pre><code class="language-html">&lt;!-- html 또는 body에 'dark' 클래스 토글 --&gt;
+&lt;div class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"&gt;
+  &lt;h1 class="text-2xl font-bold"&gt;제목&lt;/h1&gt;
+  &lt;p class="text-gray-600 dark:text-gray-400"&gt;본문&lt;/p&gt;
+  &lt;button class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400
+                 text-white px-4 py-2 rounded"&gt;
+    버튼
+  &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+  // 다크모드 토글
+  document.querySelector('#toggle').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+  });
+&lt;/script&gt;</code></pre>
+
+        <h2>@apply — 반복 클래스 추상화</h2>
+        <p>같은 클래스 조합을 여러 곳에 반복한다면 <code>@apply</code>로 컴포넌트 클래스를 만들 수 있습니다. 단, 남용하면 Tailwind의 장점이 사라지므로 적절히 사용하세요.</p>
+
+        <pre><code class="language-css">/* src/index.css */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
+           font-medium transition-colors focus:outline-none focus:ring-2
+           focus:ring-offset-2 cursor-pointer;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-gray-700 border border-gray-300
+           hover:bg-gray-50 focus:ring-gray-400;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl border border-gray-200
+           dark:border-gray-700 shadow-sm p-6;
+  }
+}</code></pre>
+
+        <h2>커스텀 디자인 토큰</h2>
+        <p><code>tailwind.config.js</code>의 <code>theme.extend</code>에서 브랜드 색상, 폰트, 간격을 추가해 일관된 디자인 시스템을 만들 수 있습니다.</p>
+
+        <pre><code class="language-js">// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50:  '#f0f9ff',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          900: '#0c4a6e',
+        },
+      },
+      fontFamily: {
+        sans: ['Pretendard Variable', 'system-ui', 'sans-serif'],
+      },
+      spacing: {
+        18: '4.5rem',
+        88: '22rem',
+      },
+      borderRadius: {
+        '4xl': '2rem',
+      },
+    },
+  },
+};</code></pre>
+
+        <h2>실전 카드 컴포넌트</h2>
+        <p>앞서 배운 내용을 종합해 블로그 카드 컴포넌트를 만들어봅니다.</p>
+
+        <pre><code class="language-html">&lt;article class="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200
+                dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg
+                transition-shadow duration-300"&gt;
+  &lt;div class="aspect-video overflow-hidden"&gt;
+    &lt;img
+      src="/post-image.jpg"
+      alt="포스트 썸네일"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    /&gt;
+  &lt;/div&gt;
+  &lt;div class="p-6"&gt;
+    &lt;div class="flex gap-2 mb-3"&gt;
+      &lt;span class="text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-700
+                   dark:text-blue-300 px-2.5 py-1 rounded-full"&gt;CSS&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2
+               group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"&gt;
+      카드 제목
+    &lt;/h3&gt;
+    &lt;p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2"&gt;
+      카드 설명이 들어갑니다. 두 줄로 자동 clamp됩니다.
+    &lt;/p&gt;
+    &lt;div class="flex items-center justify-between mt-4 pt-4 border-t
+                border-gray-100 dark:border-gray-700"&gt;
+      &lt;span class="text-xs text-gray-500"&gt;2026. 04. 09&lt;/span&gt;
+      &lt;a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-700"&gt;
+        자세히 보기 →
+      &lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/article&gt;</code></pre>
+
+        <div class="callout">
+          <strong>Tailwind를 잘 쓰는 핵심 팁</strong><br>
+          1. <strong>VS Code Tailwind CSS IntelliSense</strong> 확장을 설치하면 자동완성과 호버 프리뷰를 쓸 수 있습니다.<br>
+          2. <code>prettier-plugin-tailwindcss</code>로 클래스 순서를 자동 정렬하세요.<br>
+          3. 반복되는 조합만 <code>@apply</code>로 추상화하고, 나머지는 HTML에 인라인으로 두는 것이 검색하기 쉽습니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

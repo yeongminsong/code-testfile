@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Next.js App Router 완전 가이드 — Devlog</title>
+  <meta name="description" content="Next.js 13+ App Router의 Server Components, 중첩 레이아웃, 데이터 패칭, 스트리밍까지 Pages Router와 비교하며 완전히 이해하는 실전 가이드입니다.">
+  <link rel="canonical" href="https://info-batches.pages.dev/posts/nextjs-app-router.html">
+  <meta property="og:title" content="Next.js App Router 완전 가이드 — Devlog">
+  <meta property="og:description" content="Next.js 13+ App Router의 Server Components, 중첩 레이아웃, 데이터 패칭, 스트리밍까지 Pages Router와 비교하며 완전히 이해하는 실전 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://info-batches.pages.dev/posts/nextjs-app-router.html">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=1200&h=630&fit=crop">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Next.js App Router 완전 가이드 — Devlog">
+  <meta name="twitter:description" content="Next.js 13+ App Router의 Server Components, 중첩 레이아웃, 데이터 패칭, 스트리밍까지 실전 가이드입니다.">
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=1200&h=630&fit=crop">
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Next.js App Router 완전 가이드",
+    "description": "Next.js 13+ App Router의 Server Components, 중첩 레이아웃, 데이터 패칭, 스트리밍까지 Pages Router와 비교하며 완전히 이해하는 실전 가이드입니다.",
+    "image": "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=1200&h=630&fit=crop",
+    "url": "https://info-batches.pages.dev/posts/nextjs-app-router.html",
+    "datePublished": "2026-04-08",
+    "dateModified": "2026-04-08",
+    "author": {"@type": "Organization", "name": "Devlog"},
+    "publisher": {"@type": "Organization", "name": "Devlog", "url": "https://info-batches.pages.dev"}
+  }</script>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">JavaScript</span>
+          <span class="tag">React</span>
+          <span class="tag">Next.js</span>
+        </div>
+        <h1 class="post-h1">Next.js App Router 완전 가이드</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 08</span>
+          <span>⏱ 14분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>Next.js 13에서 도입되어 14, 15에서 안정화된 <strong>App Router</strong>는 기존 Pages Router와는 근본적으로 다른 패러다임을 가져왔습니다. React Server Components를 기반으로 서버와 클라이언트의 경계를 명확히 나누고, 중첩 레이아웃과 스트리밍으로 사용자 경험을 한 단계 끌어올립니다. 이 글에서는 App Router의 핵심 개념부터 실전 활용법까지 Pages Router와 비교하며 살펴봅니다.</p>
+
+        <h2>App Router vs Pages Router — 무엇이 다를까</h2>
+        <p>Pages Router에서는 <code>pages/</code> 디렉토리 아래 파일을 만들면 그게 곧 라우트였습니다. App Router는 <code>app/</code> 디렉토리를 사용하며 훨씬 강력한 파일 컨벤션을 제공합니다.</p>
+
+        <table style="width:100%;border-collapse:collapse;margin:1.5rem 0;">
+          <thead>
+            <tr style="background:var(--surface2);text-align:left;">
+              <th style="padding:0.75rem 1rem;border-bottom:2px solid var(--border);">특성</th>
+              <th style="padding:0.75rem 1rem;border-bottom:2px solid var(--border);">Pages Router</th>
+              <th style="padding:0.75rem 1rem;border-bottom:2px solid var(--border);">App Router</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">기본 렌더링</td>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">클라이언트 컴포넌트</td>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">서버 컴포넌트</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">레이아웃</td>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">_app.js / _document.js</td>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">layout.js (중첩 가능)</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">데이터 패칭</td>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">getServerSideProps / getStaticProps</td>
+              <td style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);">컴포넌트 내 async/await</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem 1rem;">스트리밍</td>
+              <td style="padding:0.75rem 1rem;">미지원</td>
+              <td style="padding:0.75rem 1rem;">Suspense + loading.js</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>파일 컨벤션 이해하기</h2>
+        <p>App Router는 특별한 파일명으로 역할을 부여합니다. 자주 쓰는 것들을 정리하면 다음과 같습니다.</p>
+
+        <pre><code class="language-bash">app/
+├── layout.js        # 공유 레이아웃 (필수)
+├── page.js          # 라우트 UI
+├── loading.js       # 로딩 UI (Suspense 자동)
+├── error.js         # 에러 UI (Error Boundary 자동)
+├── not-found.js     # 404 UI
+├── route.js         # API 엔드포인트
+└── blog/
+    ├── layout.js    # blog/ 전용 레이아웃
+    ├── page.js      # /blog 페이지
+    └── [slug]/
+        └── page.js  # /blog/:slug 페이지</code></pre>
+
+        <h2>React Server Components — 기본이 서버</h2>
+        <p>App Router에서 모든 컴포넌트는 기본적으로 <strong>서버 컴포넌트</strong>입니다. 서버에서만 실행되므로 DB에 직접 접근하거나 API 키를 안전하게 사용할 수 있고, 번들 크기에도 영향을 미치지 않습니다.</p>
+
+        <pre><code class="language-tsx">// app/posts/page.tsx — 서버 컴포넌트 (기본값)
+// 'use client' 없음 → 서버에서만 실행
+async function PostsPage() {
+  // DB 직접 접근 가능, API 키 노출 없음
+  const posts = await db.post.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  });
+
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;블로그&lt;/h1&gt;
+      &lt;ul&gt;
+        {posts.map(post => (
+          &lt;li key={post.id}&gt;
+            &lt;a href={`/posts/${post.slug}`}&gt;{post.title}&lt;/a&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/main&gt;
+  );
+}
+
+export default PostsPage;</code></pre>
+
+        <div class="callout">
+          <strong>서버 컴포넌트 제약사항</strong><br>
+          서버 컴포넌트에서는 <code>useState</code>, <code>useEffect</code>, 이벤트 핸들러를 사용할 수 없습니다. 상호작용이 필요한 부분만 <code>'use client'</code> 지시어로 클라이언트 컴포넌트로 분리하세요.
+        </div>
+
+        <h2>'use client' — 클라이언트 컴포넌트</h2>
+        <p>상태, 이벤트, 브라우저 API가 필요한 컴포넌트는 파일 최상단에 <code>'use client'</code>를 선언합니다. 이 컴포넌트와 그 자식들은 클라이언트 번들에 포함됩니다.</p>
+
+        <pre><code class="language-tsx">'use client';
+// app/components/LikeButton.tsx
+import { useState } from 'react';
+
+export function LikeButton({ initialCount }: { initialCount: number }) {
+  const [count, setCount] = useState(initialCount);
+  const [liked, setLiked] = useState(false);
+
+  const handleLike = async () => {
+    setLiked(true);
+    setCount(prev => prev + 1);
+    await fetch('/api/like', { method: 'POST' });
+  };
+
+  return (
+    &lt;button onClick={handleLike} aria-pressed={liked}&gt;
+      {liked ? '❤️' : '🤍'} {count}
+    &lt;/button&gt;
+  );
+}</code></pre>
+
+        <h2>중첩 레이아웃</h2>
+        <p>App Router의 가장 강력한 기능 중 하나는 중첩 레이아웃입니다. 각 디렉토리에 <code>layout.js</code>를 두면 해당 경로와 하위 경로에 자동으로 적용됩니다. 페이지 이동 시 레이아웃은 리렌더링 없이 유지됩니다.</p>
+
+        <pre><code class="language-tsx">// app/layout.tsx — 루트 레이아웃
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;html lang="ko"&gt;
+      &lt;body&gt;
+        &lt;nav&gt;사이트 전체 네비게이션&lt;/nav&gt;
+        {children}
+        &lt;footer&gt;사이트 전체 푸터&lt;/footer&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}
+
+// app/dashboard/layout.tsx — 대시보드 전용 레이아웃
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;div className="dashboard"&gt;
+      &lt;aside&gt;사이드바 메뉴&lt;/aside&gt;
+      &lt;main&gt;{children}&lt;/main&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <h2>데이터 패칭 — async/await 컴포넌트</h2>
+        <p>Pages Router의 <code>getServerSideProps</code>는 사라졌습니다. 서버 컴포넌트는 그냥 <code>async</code> 함수로 선언하고 내부에서 <code>await</code>로 데이터를 가져옵니다.</p>
+
+        <pre><code class="language-tsx">// app/posts/[slug]/page.tsx
+interface Props {
+  params: { slug: string };
+}
+
+async function PostPage({ params }: Props) {
+  // 동시 데이터 패칭 — Promise.all로 병렬 처리
+  const [post, comments] = await Promise.all([
+    fetch(`https://api.example.com/posts/${params.slug}`).then(r => r.json()),
+    fetch(`https://api.example.com/posts/${params.slug}/comments`).then(r => r.json()),
+  ]);
+
+  if (!post) notFound(); // not-found.js 렌더링
+
+  return (
+    &lt;article&gt;
+      &lt;h1&gt;{post.title}&lt;/h1&gt;
+      &lt;p&gt;{post.content}&lt;/p&gt;
+      &lt;CommentList comments={comments} /&gt;
+    &lt;/article&gt;
+  );
+}
+
+// 정적 경로 생성 (SSG)
+export async function generateStaticParams() {
+  const posts = await fetch('https://api.example.com/posts').then(r => r.json());
+  return posts.map((p: { slug: string }) => ({ slug: p.slug }));
+}
+
+export default PostPage;</code></pre>
+
+        <h2>스트리밍과 Suspense</h2>
+        <p>느린 데이터 패칭이 있어도 페이지 전체를 기다리지 않고, 준비된 부분부터 먼저 보여줄 수 있습니다. <code>loading.js</code>는 해당 경로의 로딩 상태를 자동으로 처리합니다.</p>
+
+        <pre><code class="language-tsx">// app/dashboard/loading.tsx — 자동 Suspense fallback
+export default function DashboardLoading() {
+  return (
+    &lt;div className="skeleton"&gt;
+      &lt;div className="skeleton-title" /&gt;
+      &lt;div className="skeleton-body" /&gt;
+    &lt;/div&gt;
+  );
+}
+
+// 컴포넌트 단위 스트리밍
+import { Suspense } from 'react';
+
+async function Dashboard() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;대시보드&lt;/h1&gt;
+      {/* 빠른 통계는 즉시 렌더링 */}
+      &lt;QuickStats /&gt;
+      {/* 느린 차트는 별도로 스트리밍 */}
+      &lt;Suspense fallback={&lt;ChartSkeleton /&gt;}&gt;
+        &lt;RevenueChart /&gt;
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+        <h2>Route Handlers — API 엔드포인트</h2>
+        <p>Pages Router의 <code>pages/api/</code>는 App Router에서 <code>route.js</code>로 대체되었습니다. HTTP 메서드별로 named export를 사용합니다.</p>
+
+        <pre><code class="language-ts">// app/api/posts/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const page = searchParams.get('page') ?? '1';
+
+  const posts = await db.post.findMany({
+    skip: (Number(page) - 1) * 10,
+    take: 10,
+  });
+
+  return NextResponse.json({ posts });
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const post = await db.post.create({ data: body });
+  return NextResponse.json(post, { status: 201 });
+}</code></pre>
+
+        <h2>메타데이터 API</h2>
+        <p>App Router는 SEO를 위한 메타데이터를 <code>layout.js</code>나 <code>page.js</code>에서 직접 내보낼 수 있습니다. 동적 메타데이터도 <code>generateMetadata</code> 함수로 처리합니다.</p>
+
+        <pre><code class="language-tsx">// 정적 메타데이터
+export const metadata = {
+  title: 'My Blog',
+  description: '개발 블로그',
+  openGraph: {
+    title: 'My Blog',
+    description: '개발 블로그',
+    images: ['/og-image.png'],
+  },
+};
+
+// 동적 메타데이터
+export async function generateMetadata({ params }: Props) {
+  const post = await getPost(params.slug);
+  return {
+    title: `${post.title} — My Blog`,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      images: [post.coverImage],
+    },
+  };
+}</code></pre>
+
+        <div class="callout">
+          <strong>언제 App Router를 써야 할까?</strong><br>
+          신규 프로젝트라면 App Router를 선택하세요. 서버 컴포넌트, 스트리밍, 중첩 레이아웃의 이점이 명확합니다. 기존 Pages Router 프로젝트는 점진적 마이그레이션이 가능합니다 — 두 라우터는 같은 Next.js 앱에서 공존할 수 있습니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

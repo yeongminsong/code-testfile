@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CG5VPJWVEQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CG5VPJWVEQ');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>내 정보 — Devlog</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="mypage-main" id="mypageMain">
+    <!-- JS로 렌더링 -->
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/main.js"></script>
+  <script>
+    (function() {
+      // ── 로그인 체크 ──
+      const session = Auth.getSession();
+      if (!session) {
+        location.href = '/login.html';
+        return;
+      }
+
+      const users = Auth.getUsers();
+      const user  = users.find(u => u.email === session.email);
+      if (!user) { location.href = '/login.html'; return; }
+
+      const main = document.getElementById('mypageMain');
+
+      function formatDate(iso) {
+        const d = new Date(iso);
+        return `${d.getFullYear()}. ${String(d.getMonth()+1).padStart(2,'0')}. ${String(d.getDate()).padStart(2,'0')}`;
+      }
+
+      // ── 포스트 slug → 제목 매핑 ──
+      const postTitles = {
+        'web-components':   '웹 컴포넌트로 만드는 재사용 가능한 UI',
+        'oklch':            'OKLCH로 더 나은 색상 시스템 만들기',
+        'localstorage':     'LocalStorage vs SessionStorage',
+        'git-deploy':       'Git Push로 자동 배포하기',
+        'css-layer':        'CSS @layer로 스타일 우선순위 정복하기',
+        'font-loading':     '폰트 로딩 최적화 완벽 가이드',
+        'typescript':       'TypeScript 기초부터 실전까지',
+        'react-hooks':      'React Hooks 완전 정복',
+        'vscode':           '개발자 생산성을 높이는 VS Code 확장 10선',
+        'rest-graphql':     'REST API vs GraphQL',
+        'async-javascript': 'JavaScript 비동기 완전 정복',
+        'css-grid':         'CSS Grid 레이아웃 마스터하기',
+        'nodejs':           'Node.js 입문',
+        'docker':           'Docker 기초',
+        'accessibility':    '웹 접근성(A11y) 실천 가이드',
+        'http-https':       'HTTP/HTTPS 완전 이해하기',
+        'sql-nosql':        'SQL vs NoSQL 데이터베이스 선택 가이드',
+        'core-web-vitals':  'Core Web Vitals로 성능 최적화하기',
+        'regex':            '정규표현식(Regex) 실전 가이드',
+        'design-patterns':  'JavaScript 디자인 패턴 실무 적용',
+        'nextjs-app-router':'Next.js App Router 완전 가이드',
+        'js-performance':   'JavaScript 성능 최적화 실전 가이드',
+        'tailwind-css':     'Tailwind CSS로 빠른 UI 개발하기',
+      };
+
+      function render() {
+        const myComments = Comments.getAll().filter(c => c.authorEmail === session.email)
+          .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        main.innerHTML = `
+          <!-- 프로필 카드 -->
+          <div class="mypage-hero">
+            <div class="mypage-avatar">${user.name.charAt(0)}</div>
+            <div>
+              <div class="mypage-info-name">${user.name}</div>
+              <div class="mypage-info-email">${user.email}</div>
+              <div class="mypage-info-since">가입일 · ${formatDate(user.createdAt)}</div>
+            </div>
+          </div>
+
+          <!-- 닉네임 변경 -->
+          <div class="mypage-section">
+            <h2 class="mypage-section-title">닉네임 변경</h2>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">닉네임</label>
+              <input type="text" class="form-input" id="newName" value="${user.name}" placeholder="닉네임 입력">
+            </div>
+            <button class="btn-save" id="saveNameBtn">저장</button>
+            <div class="save-msg" id="saveNameMsg"></div>
+          </div>
+
+          <!-- 비밀번호 변경 -->
+          <div class="mypage-section">
+            <h2 class="mypage-section-title">비밀번호 변경</h2>
+            <div class="form-group">
+              <label class="form-label">현재 비밀번호</label>
+              <div class="input-wrap">
+                <input type="password" class="form-input" id="currentPw" placeholder="현재 비밀번호">
+                <button type="button" class="pw-toggle" data-target="currentPw">👁</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">새 비밀번호</label>
+              <div class="input-wrap">
+                <input type="password" class="form-input" id="newPw" placeholder="8자 이상">
+                <button type="button" class="pw-toggle" data-target="newPw">👁</button>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">새 비밀번호 확인</label>
+              <div class="input-wrap">
+                <input type="password" class="form-input" id="newPwConfirm" placeholder="새 비밀번호 재입력">
+                <button type="button" class="pw-toggle" data-target="newPwConfirm">👁</button>
+              </div>
+            </div>
+            <button class="btn-save" id="savePwBtn">변경</button>
+            <div class="save-msg" id="savePwMsg"></div>
+          </div>
+
+          <!-- 내가 쓴 댓글 -->
+          <div class="mypage-section">
+            <h2 class="mypage-section-title">내가 쓴 댓글 <span style="color:var(--primary);">${myComments.length}</span></h2>
+            ${myComments.length === 0
+              ? '<p class="mypage-empty">아직 작성한 댓글이 없습니다.</p>'
+              : myComments.map(c => `
+                  <div class="mypage-comment-item">
+                    <div class="mypage-comment-post">
+                      <a href="/posts/${c.slug}.html" style="color:var(--primary);">
+                        ${postTitles[c.slug] || c.slug}
+                      </a>
+                    </div>
+                    <p class="mypage-comment-text">${c.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+                    <span class="mypage-comment-date">${formatDate(c.createdAt)}</span>
+                  </div>`).join('')
+            }
+          </div>
+        `;
+
+        bindEvents();
+      }
+
+      function showMsg(el, msg, isError) {
+        el.textContent = msg;
+        el.style.cssText = `display:block;padding:0.5rem 0.75rem;border-radius:0.4rem;
+          font-size:0.875rem;font-weight:600;margin-top:0.6rem;
+          background:${isError ? '#fef2f2' : '#f0fdf4'};
+          color:${isError ? '#dc2626' : '#16a34a'};
+          border:1px solid ${isError ? '#fecaca' : '#bbf7d0'};`;
+      }
+
+      function bindEvents() {
+        // 비밀번호 보기 토글
+        document.querySelectorAll('.pw-toggle').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const input = document.getElementById(btn.dataset.target);
+            if (!input) return;
+            input.type = input.type === 'password' ? 'text' : 'password';
+            btn.textContent = input.type === 'password' ? '👁' : '🙈';
+          });
+        });
+
+        // 닉네임 저장
+        document.getElementById('saveNameBtn')?.addEventListener('click', () => {
+          const newName = document.getElementById('newName').value.trim();
+          const msg = document.getElementById('saveNameMsg');
+          if (!newName) { showMsg(msg, '닉네임을 입력해주세요.', true); return; }
+
+          const users = Auth.getUsers();
+          const idx = users.findIndex(u => u.email === session.email);
+          if (idx === -1) return;
+          users[idx].name = newName;
+          Auth.saveUsers(users);
+          Auth.setSession(users[idx]);
+          showMsg(msg, '닉네임이 변경되었습니다.');
+          // 헤더 칩 이름 업데이트
+          document.querySelector('.user-chip-name') && (document.querySelector('.user-chip-name').textContent = newName);
+          document.querySelector('.user-chip-avatar') && (document.querySelector('.user-chip-avatar').textContent = newName.charAt(0));
+          document.querySelector('.mypage-info-name') && (document.querySelector('.mypage-info-name').textContent = newName);
+          document.querySelector('.mypage-avatar') && (document.querySelector('.mypage-avatar').textContent = newName.charAt(0));
+        });
+
+        // 비밀번호 변경
+        document.getElementById('savePwBtn')?.addEventListener('click', () => {
+          const curPw   = document.getElementById('currentPw').value;
+          const newPw   = document.getElementById('newPw').value;
+          const confirm = document.getElementById('newPwConfirm').value;
+          const msg     = document.getElementById('savePwMsg');
+
+          if (!curPw || !newPw || !confirm) { showMsg(msg, '모든 항목을 입력해주세요.', true); return; }
+          if (Auth.hash(curPw) !== user.password) { showMsg(msg, '현재 비밀번호가 올바르지 않습니다.', true); return; }
+          if (newPw.length < 8) { showMsg(msg, '새 비밀번호는 8자 이상이어야 합니다.', true); return; }
+          if (newPw !== confirm) { showMsg(msg, '새 비밀번호가 일치하지 않습니다.', true); return; }
+
+          const users = Auth.getUsers();
+          const idx = users.findIndex(u => u.email === session.email);
+          if (idx === -1) return;
+          users[idx].password = Auth.hash(newPw);
+          Auth.saveUsers(users);
+          user.password = users[idx].password;
+          document.getElementById('currentPw').value = '';
+          document.getElementById('newPw').value = '';
+          document.getElementById('newPwConfirm').value = '';
+          showMsg(msg, '비밀번호가 변경되었습니다.');
+        });
+      }
+
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -137,6 +137,40 @@ signupPw?.addEventListener('input', () => {
   pwStrength.style.setProperty('--strength-color', level.color);
 });
 
+// ── Comments Module ──
+const Comments = {
+  KEY: 'devlog_comments',
+  getAll() {
+    try { return JSON.parse(localStorage.getItem(this.KEY)) || []; }
+    catch { return []; }
+  },
+  getBySlug(slug) {
+    return this.getAll().filter(c => c.slug === slug);
+  },
+  add(slug, content, author) {
+    const all = this.getAll();
+    const c = {
+      id: Date.now().toString(),
+      slug,
+      authorName: author.name,
+      authorEmail: author.email,
+      content: content.trim(),
+      createdAt: new Date().toISOString(),
+    };
+    all.push(c);
+    localStorage.setItem(this.KEY, JSON.stringify(all));
+    return c;
+  },
+  delete(id, email) {
+    const filtered = this.getAll().filter(c => !(c.id === id && c.authorEmail === email));
+    localStorage.setItem(this.KEY, JSON.stringify(filtered));
+  },
+  formatDate(iso) {
+    const d = new Date(iso);
+    return `${d.getFullYear()}. ${String(d.getMonth()+1).padStart(2,'0')}. ${String(d.getDate()).padStart(2,'0')}`;
+  },
+};
+
 // ── Auth Helpers ──
 const Auth = {
   USERS_KEY: 'devlog_users',
@@ -177,14 +211,14 @@ function updateHeaderAuth() {
     const chip = document.createElement('div');
     chip.className = 'user-chip';
     chip.innerHTML = `
-      <span class="user-chip-avatar">${session.name.charAt(0)}</span>
-      <span class="user-chip-name">${session.name}</span>
+      <a href="/mypage.html" class="user-chip-avatar" title="내 정보">${session.name.charAt(0)}</a>
+      <a href="/mypage.html" class="user-chip-name">${session.name}</a>
       <button class="btn-logout" id="logoutBtn">로그아웃</button>
     `;
     loginBtn.replaceWith(chip);
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
       Auth.clearSession();
-      location.reload();
+      location.href = '/index.html';
     });
   }
 }
@@ -253,6 +287,91 @@ signupForm?.addEventListener('submit', e => {
   showFormMsg(msg, `${name}님, 가입을 환영합니다! 잠시 후 이동합니다.`);
   setTimeout(() => location.href = '/index.html', 1200);
 });
+
+// ── Post: Comments 자동 주입 ──
+(function injectComments() {
+  const article = document.querySelector('.post-article');
+  if (!article) return;
+
+  // URL에서 slug 추출 (/posts/foo.html → foo)
+  const slug = location.pathname.split('/').pop().replace('.html', '');
+  const session = Auth.getSession();
+
+  function buildCommentHTML(c) {
+    const canDelete = session && session.email === c.authorEmail;
+    return `
+      <div class="comment-item" data-id="${c.id}">
+        <div class="comment-avatar">${c.authorName.charAt(0)}</div>
+        <div class="comment-body">
+          <div class="comment-meta">
+            <span class="comment-name">${c.authorName}</span>
+            <span class="comment-date">${Comments.formatDate(c.createdAt)}</span>
+            ${canDelete ? `<button class="btn-comment-delete" data-id="${c.id}">삭제</button>` : ''}
+          </div>
+          <p class="comment-text">${c.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+        </div>
+      </div>`;
+  }
+
+  function renderList(container) {
+    const list = container.querySelector('.comment-list');
+    const items = Comments.getBySlug(slug);
+    list.innerHTML = items.length
+      ? items.map(buildCommentHTML).join('')
+      : '<p class="comment-empty">첫 번째 댓글을 남겨보세요!</p>';
+
+    list.querySelectorAll('.btn-comment-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!confirm('댓글을 삭제할까요?')) return;
+        Comments.delete(btn.dataset.id, session.email);
+        renderList(container);
+        updateCount(container);
+      });
+    });
+  }
+
+  function updateCount(container) {
+    const cnt = Comments.getBySlug(slug).length;
+    container.querySelector('.comments-title').textContent = `댓글 ${cnt}개`;
+  }
+
+  const section = document.createElement('section');
+  section.className = 'comments-section';
+  section.innerHTML = `
+    <h2 class="comments-title">댓글 0개</h2>
+    ${session
+      ? `<div class="comment-form">
+           <div class="comment-form-footer" style="margin-top:0;margin-bottom:0.6rem;">
+             <span class="comment-author-label">${session.name}</span>
+           </div>
+           <textarea id="commentTextarea" placeholder="댓글을 입력하세요..." rows="3"></textarea>
+           <div class="comment-form-footer">
+             <span style="font-size:0.8rem;color:var(--text-muted);">Enter로 줄바꿈</span>
+             <button class="btn-comment-submit" id="commentSubmit">등록</button>
+           </div>
+         </div>`
+      : `<div class="comment-login-prompt">
+           <a href="/login.html">로그인</a>하고 댓글을 남겨보세요.
+         </div>`
+    }
+    <div class="comment-list"></div>
+  `;
+
+  // post-wrapper 안에 article 뒤에 삽입
+  article.parentElement.appendChild(section);
+
+  renderList(section);
+  updateCount(section);
+
+  document.getElementById('commentSubmit')?.addEventListener('click', () => {
+    const ta = document.getElementById('commentTextarea');
+    if (!ta.value.trim()) { ta.focus(); return; }
+    Comments.add(slug, ta.value, session);
+    ta.value = '';
+    renderList(section);
+    updateCount(section);
+  });
+})();
 
 // ── About: Contact Form (Formspree) ──
 document.querySelector('.contact-form')?.addEventListener('submit', async e => {

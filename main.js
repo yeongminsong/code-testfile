@@ -137,21 +137,121 @@ signupPw?.addEventListener('input', () => {
   pwStrength.style.setProperty('--strength-color', level.color);
 });
 
+// ── Auth Helpers ──
+const Auth = {
+  USERS_KEY: 'devlog_users',
+  SESSION_KEY: 'devlog_session',
+
+  getUsers() {
+    try { return JSON.parse(localStorage.getItem(this.USERS_KEY)) || []; }
+    catch { return []; }
+  },
+  saveUsers(users) {
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+  },
+  getSession() {
+    try { return JSON.parse(sessionStorage.getItem(this.SESSION_KEY)); }
+    catch { return null; }
+  },
+  setSession(user) {
+    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({ name: user.name, email: user.email }));
+  },
+  clearSession() {
+    sessionStorage.removeItem(this.SESSION_KEY);
+  },
+  // 단방향 해시 (간단 demo — 실서비스엔 bcrypt 등 사용)
+  hash(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+    return h.toString(16);
+  },
+};
+
+// ── Header: 로그인 상태 반영 ──
+function updateHeaderAuth() {
+  const session = Auth.getSession();
+  const loginBtn = document.querySelector('.btn-login');
+  if (!loginBtn) return;
+
+  if (session) {
+    const chip = document.createElement('div');
+    chip.className = 'user-chip';
+    chip.innerHTML = `
+      <span class="user-chip-avatar">${session.name.charAt(0)}</span>
+      <span class="user-chip-name">${session.name}</span>
+      <button class="btn-logout" id="logoutBtn">로그아웃</button>
+    `;
+    loginBtn.replaceWith(chip);
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+      Auth.clearSession();
+      location.reload();
+    });
+  }
+}
+updateHeaderAuth();
+
+// ── 폼 알림 헬퍼 ──
+function showFormMsg(el, msg, isError = false) {
+  if (!el) return;
+  el.textContent = msg;
+  el.style.cssText = `display:block;margin-top:0.75rem;padding:0.65rem 1rem;border-radius:0.4rem;
+    font-size:0.875rem;font-weight:600;
+    background:${isError ? '#fef2f2' : '#f0fdf4'};
+    color:${isError ? '#dc2626' : '#16a34a'};
+    border:1px solid ${isError ? '#fecaca' : '#bbf7d0'};`;
+}
+
 // ── Login Form Submit ──
 loginForm?.addEventListener('submit', e => {
   e.preventDefault();
-  alert('로그인 기능은 준비 중입니다.');
-});
+  const email = document.getElementById('loginEmail')?.value.trim();
+  const pw    = document.getElementById('loginPw')?.value;
+  const msg   = document.getElementById('loginMsg');
 
-signupForm?.addEventListener('submit', e => {
-  e.preventDefault();
-  const pw = document.getElementById('signupPw')?.value;
-  const confirm = document.getElementById('signupPwConfirm')?.value;
-  if (pw !== confirm) {
-    alert('비밀번호가 일치하지 않습니다.');
+  const users = Auth.getUsers();
+  const user  = users.find(u => u.email === email && u.password === Auth.hash(pw));
+
+  if (!user) {
+    showFormMsg(msg, '이메일 또는 비밀번호가 올바르지 않습니다.', true);
     return;
   }
-  alert('회원가입이 완료되었습니다!');
+
+  Auth.setSession(user);
+  showFormMsg(msg, `${user.name}님, 환영합니다! 잠시 후 이동합니다.`);
+  setTimeout(() => location.href = '/index.html', 1200);
+});
+
+// ── Signup Form Submit ──
+signupForm?.addEventListener('submit', e => {
+  e.preventDefault();
+  const name    = document.getElementById('signupName')?.value.trim();
+  const email   = document.getElementById('signupEmail')?.value.trim();
+  const pw      = document.getElementById('signupPw')?.value;
+  const confirm = document.getElementById('signupPwConfirm')?.value;
+  const msg     = document.getElementById('signupMsg');
+
+  if (pw !== confirm) {
+    showFormMsg(msg, '비밀번호가 일치하지 않습니다.', true);
+    return;
+  }
+  if (pw.length < 8) {
+    showFormMsg(msg, '비밀번호는 8자 이상이어야 합니다.', true);
+    return;
+  }
+
+  const users = Auth.getUsers();
+  if (users.find(u => u.email === email)) {
+    showFormMsg(msg, '이미 사용 중인 이메일입니다.', true);
+    return;
+  }
+
+  const newUser = { name, email, password: Auth.hash(pw), createdAt: new Date().toISOString() };
+  users.push(newUser);
+  Auth.saveUsers(users);
+  Auth.setSession(newUser);
+
+  showFormMsg(msg, `${name}님, 가입을 환영합니다! 잠시 후 이동합니다.`);
+  setTimeout(() => location.href = '/index.html', 1200);
 });
 
 // ── About: Contact Form (Formspree) ──

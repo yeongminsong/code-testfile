@@ -925,6 +925,18 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 2rem;
 }
 .comment-login-prompt a { color: var(--primary); font-weight: 700; }
+.btn-anon-toggle {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .comment-list { display: flex; flex-direction: column; gap: 1.25rem; }
 .comment-item {
   display: flex;

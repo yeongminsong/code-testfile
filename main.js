@@ -335,6 +335,18 @@ signupForm?.addEventListener('submit', e => {
     container.querySelector('.comments-title').textContent = `댓글 ${cnt}개`;
   }
 
+  const anonFormHTML = `
+    <div class="comment-form" id="anonForm" style="display:none;">
+      <div class="comment-form-footer" style="margin-top:0;margin-bottom:0.6rem;">
+        <span class="comment-author-label">익명</span>
+      </div>
+      <textarea id="commentTextarea" placeholder="댓글을 입력하세요..." rows="3"></textarea>
+      <div class="comment-form-footer">
+        <span style="font-size:0.8rem;color:var(--text-muted);">Enter로 줄바꿈</span>
+        <button class="btn-comment-submit" id="commentSubmit">등록</button>
+      </div>
+    </div>`;
+
   const section = document.createElement('section');
   section.className = 'comments-section';
   section.innerHTML = `
@@ -351,23 +363,38 @@ signupForm?.addEventListener('submit', e => {
            </div>
          </div>`
       : `<div class="comment-login-prompt">
-           <a href="/login.html">로그인</a>하고 댓글을 남겨보세요.
-         </div>`
+           <a href="/login.html">로그인</a>하고 댓글을 남기거나
+           <button class="btn-anon-toggle" id="anonToggle">익명으로 달기</button>
+         </div>
+         ${anonFormHTML}`
     }
     <div class="comment-list"></div>
   `;
 
-  // post-wrapper 안에 article 뒤에 삽입
   article.parentElement.appendChild(section);
 
   renderList(section);
   updateCount(section);
 
+  // 익명 폼 토글
+  document.getElementById('anonToggle')?.addEventListener('click', () => {
+    const form = document.getElementById('anonForm');
+    const isOpen = form.style.display !== 'none';
+    form.style.display = isOpen ? 'none' : 'block';
+    document.getElementById('anonToggle').textContent = isOpen ? '익명으로 달기' : '닫기';
+    if (!isOpen) document.getElementById('commentTextarea')?.focus();
+  });
+
   document.getElementById('commentSubmit')?.addEventListener('click', () => {
     const ta = document.getElementById('commentTextarea');
     if (!ta.value.trim()) { ta.focus(); return; }
-    Comments.add(slug, ta.value, session);
+    const author = session || { name: '익명', email: null };
+    Comments.add(slug, ta.value, author);
     ta.value = '';
+    if (!session) {
+      document.getElementById('anonForm').style.display = 'none';
+      document.getElementById('anonToggle').textContent = '익명으로 달기';
+    }
     renderList(section);
     updateCount(section);
   });

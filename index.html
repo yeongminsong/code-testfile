@@ -52,6 +52,7 @@
         <a href="/category.html">카테고리</a>
         <a href="/tags.html">태그</a>
         <a href="/about.html">소개</a>
+        <a href="/toefl.html">TOEFL</a>
       </nav>
       <div class="header-actions">
         <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
@@ -67,8 +68,8 @@
       <h1 class="hero-title">더 나은 코드를 위한<br>지식과 경험을 공유합니다</h1>
       <p class="hero-desc">웹 개발, CSS, JavaScript, DevOps까지<br>실전에서 얻은 인사이트를 정리합니다.</p>
       <div class="hero-btns">
-        <a href="#" class="btn-primary">글 둘러보기</a>
-        <a href="#" class="btn-secondary">소개 보기</a>
+        <a href="/category.html" class="btn-primary">글 둘러보기</a>
+        <a href="/about.html" class="btn-secondary">소개 보기</a>
       </div>
     </div>
   </section>
@@ -90,7 +91,7 @@
     <div class="posts-grid">
 
       <!-- Featured -->
-      <article class="post-card featured">
+      <article class="post-card featured" data-category="Web">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=900&h=500&fit=crop&auto=format');background-size:cover;background-position:center;">
           <span class="featured-badge">Featured</span>
         </div>
@@ -108,7 +109,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="CSS">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">CSS</span><span class="tag">Design</span></div>
@@ -121,7 +122,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">Web</span></div>
@@ -134,7 +135,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="Git">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Git</span><span class="tag">DevOps</span></div>
@@ -147,7 +148,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="CSS">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">CSS</span><span class="tag">Design</span></div>
@@ -160,7 +161,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="Web">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Web</span><span class="tag">Performance</span></div>
@@ -173,7 +174,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">TypeScript</span></div>
@@ -186,7 +187,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">React</span></div>
@@ -199,7 +200,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="DevOps">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Tools</span><span class="tag">DevOps</span></div>
@@ -212,7 +213,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="Web">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Web</span><span class="tag">API</span></div>
@@ -225,7 +226,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">Web</span></div>
@@ -238,7 +239,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="CSS">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">CSS</span><span class="tag">Design</span></div>
@@ -251,7 +252,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">Web</span></div>
@@ -264,7 +265,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="DevOps">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1605745341112-85968b19335b?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">DevOps</span><span class="tag">Tools</span></div>
@@ -277,7 +278,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="Web">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Web</span><span class="tag">UX</span></div>
@@ -290,7 +291,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="Web">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Web</span><span class="tag">Network</span></div>
@@ -303,7 +304,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="Web">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Database</span><span class="tag">Backend</span></div>
@@ -316,7 +317,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="Web">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">Performance</span><span class="tag">Web</span></div>
@@ -329,7 +330,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">Tools</span></div>
@@ -342,7 +343,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">Architecture</span></div>
@@ -355,7 +356,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">React</span><span class="tag">Next.js</span></div>
@@ -368,7 +369,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="JavaScript">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">JavaScript</span><span class="tag">Performance</span></div>
@@ -381,7 +382,7 @@
         </div>
       </article>
 
-      <article class="post-card">
+      <article class="post-card" data-category="CSS">
         <div class="post-thumb" style="background-image:url('https://images.unsplash.com/photo-1587440871875-191322ee64b0?w=800&h=420&fit=crop&auto=format');background-size:cover;background-position:center;"></div>
         <div class="post-body">
           <div class="post-tags"><span class="tag">CSS</span><span class="tag">Design</span></div>
@@ -396,9 +397,6 @@
 
     </div>
 
-    <div class="load-more-wrap">
-      <button class="btn-load-more">더 보기</button>
-    </div>
   </main>
 
   <!-- Footer -->

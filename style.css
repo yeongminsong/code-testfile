@@ -311,6 +311,9 @@ a { color: inherit; text-decoration: none; }
   box-shadow: var(--card-shadow);
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
   transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.25s, border-color 0.25s;
 }
 .post-card:hover {
@@ -382,7 +385,6 @@ a { color: inherit; text-decoration: none; }
 
 .post-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   font-size: 0.82rem;
   border-top: 1px solid var(--border);
@@ -391,14 +393,6 @@ a { color: inherit; text-decoration: none; }
 }
 
 .date { color: var(--text-muted); }
-
-.read-more {
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 0.85rem;
-  transition: color 0.2s;
-}
-.read-more:hover { color: var(--primary-dark); }
 
 
 /* ── Footer ── */

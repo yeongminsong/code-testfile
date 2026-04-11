@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CG5VPJWVEQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CG5VPJWVEQ');
+  </script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PWA(Progressive Web App) 완전 가이드 — Devlog</title>
+  <meta name="description" content="Service Worker, Web App Manifest, 오프라인 캐싱, 푸시 알림까지 — PWA를 처음부터 끝까지 구현하는 실전 가이드입니다.">
+  <meta property="og:title" content="PWA(Progressive Web App) 완전 가이드 — Devlog">
+  <meta property="og:description" content="Service Worker, Web App Manifest, 오프라인 캐싱, 푸시 알림까지 — PWA를 처음부터 끝까지 구현하는 실전 가이드입니다.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&h=630&fit=crop">
+  <meta property="og:url" content="https://info-batches.pages.dev/posts/pwa.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PWA(Progressive Web App) 완전 가이드 — Devlog">
+  <meta name="twitter:description" content="Service Worker, Web App Manifest, 오프라인 캐싱, 푸시 알림까지 — PWA를 처음부터 끝까지 구현하는 실전 가이드입니다.">
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&h=630&fit=crop">
+  <link rel="canonical" href="https://info-batches.pages.dev/posts/pwa.html">
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "PWA(Progressive Web App) 완전 가이드",
+    "description": "Service Worker, Web App Manifest, 오프라인 캐싱, 푸시 알림까지 — PWA를 처음부터 끝까지 구현하는 실전 가이드입니다.",
+    "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&h=630&fit=crop",
+    "url": "https://info-batches.pages.dev/posts/pwa.html",
+    "datePublished": "2026-04-10",
+    "dateModified": "2026-04-10",
+    "author": {"@type": "Organization", "name": "Devlog"},
+    "publisher": {"@type": "Organization", "name": "Devlog", "url": "https://info-batches.pages.dev"}
+  }</script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5414405329595188" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/index.html" class="logo">Devlog</a>
+      <nav class="nav">
+        <a href="/index.html">홈</a>
+        <a href="/category.html">카테고리</a>
+        <a href="/tags.html">태그</a>
+        <a href="/about.html">소개</a>
+        <a href="/toefl.html">TOEFL</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙</button>
+        <a href="/login.html" class="btn-login">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="post-hero-img" style="background-image:url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1400&h=500&fit=crop&auto=format');"></div>
+
+  <div class="post-wrapper">
+    <a href="/index.html" class="post-back">← 목록으로</a>
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-tags">
+          <span class="tag">Web</span>
+          <span class="tag">Performance</span>
+        </div>
+        <h1 class="post-h1">PWA(Progressive Web App) 완전 가이드</h1>
+        <div class="post-meta">
+          <span>📅 2026. 04. 10</span>
+          <span>⏱ 12분 읽기</span>
+        </div>
+      </header>
+
+      <div class="post-content">
+        <p>스마트폰 사용자가 앱 스토어에서 새 앱을 다운받는 빈도는 해마다 감소하고 있습니다. 반면 브라우저로 접근할 수 있는 웹 서비스 이용은 꾸준히 늘고 있죠. <strong>PWA(Progressive Web App)</strong>는 이 두 세계의 장점을 결합한 기술입니다. 설치 없이도 앱처럼 동작하고, 오프라인에서도 콘텐츠를 볼 수 있으며, 홈 화면에 아이콘을 추가할 수 있습니다.</p>
+
+        <p>이 글에서는 PWA를 구성하는 핵심 기술인 Web App Manifest, Service Worker, 캐싱 전략을 처음부터 실전 코드와 함께 살펴봅니다.</p>
+
+        <h2>PWA의 세 가지 핵심 요건</h2>
+        <p>구글이 정의한 PWA의 핵심 요건은 다음 세 가지입니다.</p>
+        <ul>
+          <li><strong>신뢰성(Reliable)</strong> — 네트워크 상태와 무관하게 즉시 로드됩니다.</li>
+          <li><strong>빠름(Fast)</strong> — 스크롤과 애니메이션이 부드럽고 사용자 입력에 즉각 반응합니다.</li>
+          <li><strong>몰입감(Engaging)</strong> — 앱처럼 설치하고, 전체 화면으로 실행하며, 홈 화면에 추가할 수 있습니다.</li>
+        </ul>
+
+        <h2>1단계 — Web App Manifest 설정</h2>
+        <p>Manifest는 앱의 이름, 아이콘, 시작 URL, 화면 방향 등을 정의하는 JSON 파일입니다. 브라우저가 이 파일을 읽어 "홈 화면에 추가" 프롬프트를 표시합니다.</p>
+        <pre><code class="language-json">// manifest.json
+{
+  "name": "My Devlog",
+  "short_name": "Devlog",
+  "description": "웹 개발 기술 블로그",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}</code></pre>
+        <p>HTML <code>&lt;head&gt;</code>에 아래 한 줄을 추가하면 브라우저가 Manifest를 인식합니다.</p>
+        <pre><code class="language-html">&lt;link rel="manifest" href="/manifest.json"&gt;</code></pre>
+
+        <h2>2단계 — Service Worker 등록</h2>
+        <p>Service Worker는 브라우저와 네트워크 사이에서 동작하는 별도의 JavaScript 스레드입니다. 네트워크 요청을 가로채고, 캐시를 읽거나 쓰고, 백그라운드에서 푸시 알림을 받을 수 있습니다.</p>
+        <pre><code class="language-javascript">// main.js — Service Worker 등록
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('SW 등록 성공:', registration.scope);
+    } catch (error) {
+      console.error('SW 등록 실패:', error);
+    }
+  });
+}</code></pre>
+
+        <h2>3단계 — Service Worker 구현과 캐싱 전략</h2>
+        <p>Service Worker의 생명주기는 <strong>install → activate → fetch</strong> 세 단계로 이루어집니다.</p>
+        <pre><code class="language-javascript">// sw.js
+const CACHE_NAME = 'devlog-v1';
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/style.css',
+  '/main.js',
+  '/icons/icon-192.png'
+];
+
+// install — 정적 자산을 캐시에 저장
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+  );
+  self.skipWaiting(); // 새 SW를 즉시 활성화
+});
+
+// activate — 오래된 캐시 정리
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      )
+    )
+  );
+  self.clients.claim();
+});</code></pre>
+
+        <h2>캐싱 전략 선택하기</h2>
+        <p>상황에 따라 아래 네 가지 전략을 조합해 사용합니다.</p>
+
+        <h3>Cache First (캐시 우선)</h3>
+        <p>캐시에 있으면 캐시를 반환하고, 없을 때만 네트워크에 요청합니다. 폰트·이미지처럼 거의 바뀌지 않는 자산에 적합합니다.</p>
+        <pre><code class="language-javascript">self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cached) =>
+      cached ?? fetch(event.request)
+    )
+  );
+});</code></pre>
+
+        <h3>Network First (네트워크 우선)</h3>
+        <p>네트워크에 먼저 요청하고, 실패하면 캐시를 반환합니다. 최신 데이터가 중요한 API 응답에 적합합니다.</p>
+        <pre><code class="language-javascript">self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // 성공 시 캐시에도 저장
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
+});</code></pre>
+
+        <h3>Stale While Revalidate</h3>
+        <p>캐시를 즉시 반환하면서 동시에 네트워크 요청을 보내 캐시를 갱신합니다. 속도와 최신성을 동시에 원할 때 최선의 선택입니다.</p>
+        <pre><code class="language-javascript">self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(event.request).then((cached) => {
+        const fetchPromise = fetch(event.request).then((response) => {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+        return cached ?? fetchPromise;
+      })
+    )
+  );
+});</code></pre>
+
+        <h2>오프라인 폴백 페이지</h2>
+        <p>네트워크도 없고 캐시에도 없을 때, 사용자에게 친절한 오프라인 안내 페이지를 보여줄 수 있습니다.</p>
+        <pre><code class="language-javascript">// install 단계에서 오프라인 페이지도 캐싱
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.addAll([...STATIC_ASSETS, '/offline.html'])
+    )
+  );
+});
+
+// fetch 단계에서 폴백
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/offline.html'))
+    );
+  }
+});</code></pre>
+
+        <h2>Lighthouse로 PWA 점수 확인하기</h2>
+        <p>Chrome DevTools의 Lighthouse 탭을 열고 "Progressive Web App" 항목을 체크해 감사를 실행하면 PWA 준수 여부를 항목별로 확인할 수 있습니다. 특히 다음 항목을 꼭 통과해야 합니다.</p>
+        <ul>
+          <li>HTTPS로 서빙되는가</li>
+          <li>Web App Manifest에 필수 필드가 있는가</li>
+          <li>Service Worker가 등록되어 있는가</li>
+          <li>오프라인에서도 200 응답을 반환하는가</li>
+        </ul>
+
+        <div class="callout">
+          <strong>핵심 정리</strong><br>
+          PWA의 시작은 <code>manifest.json</code>과 Service Worker 등록 두 가지입니다. 캐싱 전략은 정적 자산에는 Cache First, API에는 Network First, 블로그 콘텐츠처럼 중간 성격의 자원에는 Stale While Revalidate를 조합하면 최적의 경험을 만들 수 있습니다.
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-logo">Devlog</span>
+      <p>즐겁게 만들고 기록합니다 · contact@devlog.kr</p>
+      <div class="footer-links">
+        <a href="/terms.html">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

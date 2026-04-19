@@ -144,7 +144,7 @@ signupPw?.addEventListener('input', () => {
 
 // ── Comments Module ──
 const Comments = {
-  KEY: 'devlog_comments',
+  KEY: 'mailissue_comments',
   getAll() {
     try { return JSON.parse(localStorage.getItem(this.KEY)) || []; }
     catch { return []; }
@@ -178,8 +178,8 @@ const Comments = {
 
 // ── Auth Helpers ──
 const Auth = {
-  USERS_KEY: 'devlog_users',
-  SESSION_KEY: 'devlog_session',
+  USERS_KEY: 'mailissue_users',
+  SESSION_KEY: 'mailissue_session',
 
   getUsers() {
     try { return JSON.parse(localStorage.getItem(this.USERS_KEY)) || []; }
